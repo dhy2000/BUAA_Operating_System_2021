@@ -8,7 +8,6 @@ int main()
 	    m = (m << 3) + (m << 1) + (n1 % 10);
 	    n1 /= 10;
 	}
-	// printf("m = %d\nn = %d\n", m, n);
 	if(m == n){
 		printf("Y");
 	}else{
