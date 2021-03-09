@@ -18,4 +18,4 @@ $(obj_dir)/%.o: $(src_dir)/%.c $(inc_dir)/$(inc)
 clean:
 	rm $(obj_dir)/fibo.o
 	rm $(obj_dir)/main.o
-	rm $(target)
+
