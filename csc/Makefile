@@ -16,6 +16,7 @@ $(obj_dir)/%.o: $(src_dir)/%.c $(inc_dir)/$(inc)
 .PHONY: clean
 
 clean:
-	rm $(obj_dir)/fibo.o
+	rm fibo
+#	rm $(obj_dir)/fibo.o
 	rm $(obj_dir)/main.o
 
