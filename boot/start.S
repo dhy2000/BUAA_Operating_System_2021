@@ -35,7 +35,7 @@ LEAF(_start) /*LEAF is defined in asm.h and LEAF functions don't call other func
 	  call main func.
 	*/
     lui sp, 0x8040
-    jalr ra sp
+    jal main
     nop
 
 			
