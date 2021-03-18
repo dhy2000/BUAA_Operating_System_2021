@@ -43,20 +43,20 @@ lp_Print(void (*output)(void *, char *, int),
     
     char buf[LP_MAX_BUF];
 
-    char c;
-    char *s;
-    long int num;
+    char c = 0;
+    char *s = buf;
+    long int num = 0;
 
 	
 
-    int longFlag;
-    int negFlag;
-    int width;
-    int prec;
-    int ladjust;
-    char padc;
+    int longFlag = 0;
+    int negFlag = 0;
+    int width = 0;
+    int prec = 0;
+    int ladjust = 0;
+    char padc = 0;
 
-    int length;
+    int length = 0;
 
     /*
         Exercise 1.5. Please fill in two parts in this file.
@@ -65,24 +65,64 @@ lp_Print(void (*output)(void *, char *, int),
     for(;;) {
 
         /* Part1: your code here */
-
+    while (*fmt != '\0' && *fmt != '%')
 	{ 
 	    /* scan for the next '%' */
 	    /* flush the string found so far */
-
+        OUTPUT(arg, fmt, 1);
 	    /* check "are we hitting the end?" */
+        fmt++;
 	}
-
+    
+    if (*fmt == '\0')
+        break;
 	
 	/* we found a '%' */
-	
+	fmt++;
 	/* check for long */
-
+    
 	/* check for other prefixes */
 
 	/* check format flag */
-	
+    
+    // %[flags][width][.precsion][length]specifier
 
+    // [flags]
+    if (*fmt == '-') {
+        ladjust = 1;
+        fmt++;
+    } else if (*fmt == '0') {
+        padc = '0';
+        fmt++;
+    } else {
+        ladjust = 0;
+        padc = 0;
+    }
+    // [width]
+    if (IsDigit(*fmt)) {
+        width = 0;
+        while (IsDigit(*fmt)) {
+            width = (width << 3) + (width << 1) + (Ctod(*fmt));
+            fmt++;
+        }
+    } else {
+        width = 2147483647;
+    }
+    // [.precision]
+    if (*fmt == '.') {
+        fmt++;
+        prec = 0;
+        while (IsDigit(*fmt)) {
+            prec = (prec << 3) + (prec << 1) + (Ctod(*fmt));
+            fmt++;
+        }
+    }
+    // [length]
+    if (*fmt == 'l') {
+        longFlag = 1;
+        fmt++;
+    }
+    
 	negFlag = 0;
 	switch (*fmt) {
 	 case 'b':
@@ -108,7 +148,11 @@ lp_Print(void (*output)(void *, char *, int),
 			Refer to other part (case 'b',case 'o' etc.) and func PrintNum to complete this part.
 			Think the difference between case 'd' and others. (hint: negFlag).
 		*/
-	    
+        if (num < 0) {
+            negFlag = 1;
+        }
+	    length = PrintNum(buf, num, 10, negFlag, width, ladjust, padc, 0);
+        OUTPUT(arg, buf, length);
 		break;
 
 	 case 'o':
