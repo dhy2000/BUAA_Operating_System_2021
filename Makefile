@@ -26,7 +26,7 @@ objects :=$(objects) $(test_dir)/*.o
 endif
 
 
-.PHONY: all $(modules) clean
+.PHONY: all $(modules) clean boot
 
 all: $(modules) vmlinux
 
@@ -43,5 +43,8 @@ clean:
 			$(MAKE) --directory=$$d clean; \
 		done; \
 	rm -rf *.o *~ $(vmlinux_elf)
+
+boot:
+	gxemul -E testmips -C R3000 -M 64 gxemul/vmlinux
 
 include include.mk
