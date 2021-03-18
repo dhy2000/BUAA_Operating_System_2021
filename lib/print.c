@@ -99,14 +99,10 @@ lp_Print(void (*output)(void *, char *, int),
         padc = 0;
     }
     // [width]
-    if (IsDigit(*fmt)) {
-        width = 0;
-        while (IsDigit(*fmt)) {
-            width = (width << 3) + (width << 1) + (Ctod(*fmt));
-            fmt++;
-        }
-    } else {
-        width = 2147483647;
+    width = 0;
+    while (IsDigit(*fmt)) {
+        width = (width << 3) + (width << 1) + (Ctod(*fmt));
+        fmt++;
     }
     // [.precision]
     if (*fmt == '.') {
