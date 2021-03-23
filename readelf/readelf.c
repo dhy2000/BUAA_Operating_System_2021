@@ -44,17 +44,27 @@ int is_elf_format(u_char *binary)
     Exercise 1.2. Please complete func "readelf". 
 */
 int readelf(u_char *binary, int size)
-{
+{ 
         Elf32_Ehdr *ehdr = (Elf32_Ehdr *)binary;
+        
+#define EI_DATA 5
+#define ELF_ENDIAN (ehdr->e_ident[EI_DATA])
+#define ELF_LITTLE_ENDIAN (ELF_ENDIAN == 1)
+#define ELF_BIG_ENDIAN (ELF_ENDIAN == 2)
+
+#define ELF_BIG2LITTLE_16(x) ((((x)&0xFF)<<8)|((((x)&0xFF00)>>8)&0xFF))
+
+#define ELF_BIG2LITTLE_32(x) ( (((x)&0xFF)<<24) | (((((x)&0xFF00)>>8)&0xFF)<<16) | (((((x)&0xFF0000)>>16)&0xFF)<<8) | (((((x)&0xFF000000)>>24)&0xFF)) )
 
         int Nr;
 
-        // Elf32_Shdr *shdr = NULL;
+        Elf32_Shdr *shdr = NULL;
         Elf32_Phdr *phdr = NULL;
 
-        // u_char *ptr_sh_table = NULL;
-        // Elf32_Half sh_entry_count;
-        // Elf32_Half sh_entry_size;
+        u_char *ptr_sh_table = NULL;
+        Elf32_Half sh_entry_count;
+        Elf32_Half sh_entry_size;
+        
         u_char *ptr_ph_table = NULL;
         Elf32_Half ph_entry_count;
         Elf32_Half ph_entry_size;
@@ -66,21 +76,30 @@ int readelf(u_char *binary, int size)
         }
 
         // get section table addr, section header number and section header size.
-        // ptr_sh_table = binary + ehdr->e_shoff;
-        // sh_entry_size = ehdr->e_shentsize;
-        // sh_entry_count = ehdr->e_shnum;
+        ptr_sh_table = binary + ELF_BIG2LITTLE_32(ehdr->e_shoff);
+        sh_entry_size = ELF_BIG2LITTLE_16(ehdr->e_shentsize);
+        sh_entry_count = ELF_BIG2LITTLE_16(ehdr->e_shnum);
         
         ptr_ph_table = binary + ehdr->e_phoff;
         ph_entry_size = ehdr->e_phentsize;
         ph_entry_count = ehdr->e_phnum;
 
         // for each section header, output section number and section addr. 
-        // shdr = ptr_sh_table;
-        for (Nr = 0; Nr < ph_entry_count; Nr++) {
-            phdr = (Elf32_Phdr*) ptr_ph_table;
-            printf("%d:0x%x,0x%x\n", Nr, phdr->p_offset, phdr->p_align);
-
-            ptr_ph_table += ph_entry_size;
+        
+        // Decide the Endian
+        if (ELF_BIG_ENDIAN) {
+            for (Nr = 0; Nr < sh_entry_count; Nr++) {
+                shdr = (Elf32_Shdr*) ptr_sh_table;
+                printf("%d:0x%x\n", Nr, ELF_BIG2LITTLE_32(shdr->sh_addr)); 
+                ptr_sh_table += sh_entry_size;
+            }
+        }        
+        else {
+            for (Nr = 0; Nr < ph_entry_count; Nr++) {
+                phdr = (Elf32_Phdr*) ptr_ph_table;
+                printf("%d:0x%x,0x%x\n", Nr, (phdr->p_filesz), (phdr->p_memsz)); 
+                ptr_ph_table += ph_entry_size;
+            }
         }
         // hint: section number starts at 0.
         
