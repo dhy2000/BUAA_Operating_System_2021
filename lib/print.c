@@ -226,11 +226,12 @@ lp_Print(void (*output)(void *, char *, int),
      
     case 'T':
         saddr = (void*)va_arg(ap, void *);
-        if (stypeid == 1) 
-            length = PrintS1(buf, saddr, width, ladjust, padc);
-        else
+        if (stypeid == 1)
             length = PrintChar(buf, '.', width, ladjust);
-            // length = PrintS2(buf, saddr, width, ladjust, padc);
+            // length = PrintS1(buf, saddr, width, ladjust, padc);
+        else
+            // length = PrintChar(buf, '.', width, ladjust);
+            length = PrintS2(buf, saddr, width, ladjust, padc);
         OUTPUT(arg, buf, length);
         break;
 
