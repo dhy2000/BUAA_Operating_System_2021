@@ -103,7 +103,7 @@ lp_Print(void (*output)(void *, char *, int),
         fmt++;
     } else {
         ladjust = 0;
-        padc = 0;
+        padc = ' ';
     }
     // [width]
     width = 0;
