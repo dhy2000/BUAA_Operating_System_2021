@@ -229,7 +229,8 @@ lp_Print(void (*output)(void *, char *, int),
         if (stypeid == 1) 
             length = PrintS1(buf, saddr, width, ladjust, padc);
         else
-            length = PrintS2(buf, saddr, width, ladjust, padc);
+            length = PrintChar(buf, '.', width, ladjust);
+            // length = PrintS2(buf, saddr, width, ladjust, padc);
         OUTPUT(arg, buf, length);
         break;
 
