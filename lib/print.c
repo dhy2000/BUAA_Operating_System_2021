@@ -20,6 +20,9 @@ extern int PrintChar(char *, char, int, int);
 extern int PrintString(char *, char *, int, int);
 extern int PrintNum(char *, unsigned long, int, int, int, int, char, int);
 
+extern int PrintS1(char *, void *, int, int, char);
+extern int PrintS2(char *, void *, int, int, char);
+
 /* private variable */
 static const char theFatalMsg[] = "fatal error in lp_Print!";
 
@@ -58,6 +61,10 @@ lp_Print(void (*output)(void *, char *, int),
 
     int length = 0;
 
+    int stypeid = 0;
+
+    void *saddr = arg;
+
     /*
         Exercise 1.5. Please fill in two parts in this file.
     */
@@ -85,7 +92,7 @@ lp_Print(void (*output)(void *, char *, int),
 
 	/* check format flag */
     
-    // %[flags][width][.precsion][length]specifier
+    // %[flags][width][.precsion][length][typeid]specifier
 
     // [flags]
     if (*fmt == '-') {
@@ -116,6 +123,17 @@ lp_Print(void (*output)(void *, char *, int),
     // [length]
     if (*fmt == 'l') {
         longFlag = 1;
+        fmt++;
+    }
+
+    // [stypeid]
+    if (*fmt == '$') {
+        fmt++;
+        if (*fmt == '1') {
+            stypeid = 1;
+        } else {
+            stypeid = 2;
+        }
         fmt++;
     }
     
@@ -205,6 +223,16 @@ lp_Print(void (*output)(void *, char *, int),
 	    length = PrintString(buf, s, width, ladjust);
 	    OUTPUT(arg, buf, length);
 	    break;
+     
+    case 'T':
+        saddr = (void*)va_arg(ap, void *);
+        if (stypeid == 1) 
+            length = PrintS1(buf, saddr, width, ladjust, padc);
+        else
+            length = PrintS2(buf, saddr, width, ladjust, padc);
+        OUTPUT(arg, buf, length);
+        break;
+
 
 	 case '\0':
 	    fmt --;
@@ -224,6 +252,92 @@ lp_Print(void (*output)(void *, char *, int),
 
 
 /* --------------- local help functions --------------------- */
+struct s1 {
+    int a;
+    char b;
+    char c;
+    int d;
+};
+
+    
+int
+PrintS1(char * buf, void * addr, int width, int ladjust, char padc)
+{
+    int length = 0;
+    char *head = buf;
+    struct s1 *ps1 = (struct s1*) addr;
+    // '{'
+    *(head++) = '{';
+    // int a
+    int na = ps1->a;
+    if (na < 0)
+        length = PrintNum(head, -na, 10, 1, width, ladjust, padc, 0);
+    else
+        length = PrintNum(head, na, 10, 0, width, ladjust, padc, 0);
+    head += length;
+    // ','
+    *(head++) = ',';
+    // char b
+    length = PrintChar(head, ps1->b, width, ladjust);
+    head += length;
+    // ','
+    *(head++) = ',';
+    // char c
+    length = PrintChar(head, ps1->c, width, ladjust);
+    head += length;
+    // ','
+    *(head++) = ',';
+    // int d
+    int nd = ps1->d;
+    if (nd < 0)
+        length = PrintNum(head, -nd, 10, 1, width, ladjust, padc, 0);
+    else
+        length = PrintNum(head, nd, 10, 0, width, ladjust, padc, 0);
+    head += length;
+    // '}'
+    *(head++) = '}';
+    return head - buf;
+}
+
+struct s2 {
+    int size;
+    int c[];
+};
+
+int
+PrintS2(char * buf, void * addr, int width, int ladjust, char padc)
+{
+    int length = 0;
+    char *head = buf;
+    struct s2 *ps2 = (struct s2*) addr;
+    int i = 0;
+    // '{'
+    *(head++) = '{';
+    // int size
+    int s2size = ps2->size;
+    if (s2size < 0)
+        length = PrintNum(head, -s2size, 10, 1, width, ladjust, padc, 0);
+    else
+        length = PrintNum(head, s2size, 10, 0, width, ladjust, padc, 0);
+    head += length;
+    for (i = 0; i < s2size; i++) {
+        // ','
+        *(head++) = ',';
+        // num
+        int ai = ps2->c[i];
+        if (ai < 0)
+            length = PrintNum(head, -ai, 10, 1, width, ladjust, padc, 0);
+        else
+            length = PrintNum(head, ai, 10, 0, width, ladjust, padc, 0);
+        head += length;
+    }
+    // '}'
+    *(head++) = '}';
+
+    return head - buf;
+}
+    
+    
 int
 PrintChar(char * buf, char c, int length, int ladjust)
 {
