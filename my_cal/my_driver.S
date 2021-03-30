@@ -53,9 +53,9 @@ LEAF(_my_exit)
     .set mips2
     lui t0, 0xb000 /* start address */
 
-    addiu t1, zero, 0x233
+    /* addiu t1, zero, 0x233 */
 
-    sb t1, 0x10(t0)
+    lb zero, 0x10(t0)
 
     jr ra
     nop
