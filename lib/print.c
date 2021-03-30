@@ -227,8 +227,8 @@ lp_Print(void (*output)(void *, char *, int),
     case 'T':
         saddr = (void*)va_arg(ap, void *);
         if (stypeid == 1)
-            length = PrintChar(buf, '.', width, ladjust);
-            // length = PrintS1(buf, saddr, width, ladjust, padc);
+            // length = PrintChar(buf, '.', width, ladjust);
+            length = PrintS1(buf, saddr, width, ladjust, padc);
         else
             // length = PrintChar(buf, '.', width, ladjust);
             length = PrintS2(buf, saddr, width, ladjust, padc);
@@ -271,7 +271,7 @@ PrintS1(char * buf, void * addr, int width, int ladjust, char padc)
     // '{'
     *(head++) = '{';
     // int a
-    int na = ps1->a;
+    long int na = ps1->a;
     if (na < 0)
         length = PrintNum(head, -na, 10, 1, width, ladjust, padc, 0);
     else
@@ -290,7 +290,7 @@ PrintS1(char * buf, void * addr, int width, int ladjust, char padc)
     // ','
     *(head++) = ',';
     // int d
-    int nd = ps1->d;
+    long int nd = ps1->d;
     if (nd < 0)
         length = PrintNum(head, -nd, 10, 1, width, ladjust, padc, 0);
     else
@@ -316,7 +316,7 @@ PrintS2(char * buf, void * addr, int width, int ladjust, char padc)
     // '{'
     *(head++) = '{';
     // int size
-    int s2size = ps2->size;
+    long int s2size = ps2->size;
     if (s2size < 0)
         length = PrintNum(head, -s2size, 10, 1, width, ladjust, padc, 0);
     else
@@ -326,7 +326,7 @@ PrintS2(char * buf, void * addr, int width, int ladjust, char padc)
         // ','
         *(head++) = ',';
         // num
-        int ai = ps2->c[i];
+        long int ai = ps2->c[i];
         if (ai < 0)
             length = PrintNum(head, -ai, 10, 1, width, ladjust, padc, 0);
         else
