@@ -177,7 +177,7 @@ page_init(void)
 {
     /* Step 1: Initialize page_free_list. */
     /* Hint: Use macro `LIST_INIT` defined in include/queue.h. */
-    LIST_INIT(page_free_list); 
+    LIST_INIT(&page_free_list); 
 
     /* Step 2: Align `freemem` up to multiple of BY2PG. */
     freemem = ROUND(freemem, BY2PG);
@@ -193,7 +193,7 @@ page_init(void)
     /* Step 4: Mark the other memory as free. */
     int addr = PADDR(freemem);
     for (; addr < maxpa; addr += BY2PG) {
-        LIST_INSERT_HEAD(page_free_list, pa2page(addr), pp_link); 
+        LIST_INSERT_HEAD(&page_free_list, pa2page(addr), pp_link); 
     }
 }
 
@@ -218,14 +218,14 @@ page_alloc(struct Page **pp)
 
     /* Step 1: Get a page from free memory. If fails, return the error code.*/
     if (LIST_FIRST(&page_free_list) == NULL) {
-        return E_NO_MEM;
+        return -E_NO_MEM;
     }
     ppage_temp = LIST_FIRST(&page_free_list);
     LIST_REMOVE(ppage_temp, pp_link);
 
     /* Step 2: Initialize this page.
      * Hint: use `bzero`. */
-    bzero(page2kva(ppage_temp), BY2PG);
+    bzero((void*)(page2kva(ppage_temp)), BY2PG);
     ppage_temp->pp_ref = 0;
     *pp = ppage_temp;
     return 0;

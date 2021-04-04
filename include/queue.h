@@ -153,12 +153,12 @@
  * Note: this function has big differences with LIST_INSERT_HEAD !
  */
 #define LIST_INSERT_TAIL(head, elm, field) do { \
-    for ((elm).field->le_next = LIST_FIRST((head)) ; \
-            (((elm).field->le_next) != NULL && (elm).field->le_next).field->le_next != NULL; \
-            ((elm).field->le_next) = ((elm).field->le_next).field->le_next);    \
-    ((elm).field->le_next).field->le_next = (elm);                      \
-    (elm).field->le_prev = &(((elm).field->le_next).field->le_next);    \
-    (elm).field->le_next = NULL;    \
+    for ((elm)->field.le_next = LIST_FIRST((head)) ; \
+            ((elm)->field.le_next) != NULL && ((elm)->field.le_next)->field.le_next != NULL; \
+            ((elm)->field.le_next) = ((elm)->field.le_next)->field.le_next);    \
+    ((elm)->field.le_next)->field.le_next = (elm);                      \
+    (elm)->field.le_prev = &(((elm)->field.le_next)->field.le_next);    \
+    (elm)->field.le_next = NULL;    \
 } while (0)
 // 1. find the exists last node of the link list
 //    now the elm.next == tail
