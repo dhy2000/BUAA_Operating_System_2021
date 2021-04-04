@@ -26,9 +26,9 @@ void mips_detect_memory()
 {
     /* Step 1: Initialize basemem.
      * (When use real computer, CMOS tells us how many kilobytes there are). */
-    maxpa = 0x3FFFFFFF;
+    maxpa = 0x3FFFFFF;
     npage = 16384;
-    basemem = 0x3FFFFFFF;
+    basemem = 0x3FFFFFF;
     extmem = 0;
     // Step 2: Calculate corresponding npage value.
 
