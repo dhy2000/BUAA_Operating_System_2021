@@ -108,10 +108,18 @@
  * already in the list.  The "field" name is the link element
  * as above.
  */
-#define LIST_INSERT_AFTER(listelm, elm, field)
-        // Note: assign a to b <==> a = b
+#define LIST_INSERT_AFTER(listelm, elm, field) do {             \
+    (elm)->field.le_next = (listelm)->field.le_next;      \
+    if ((listelm)->field.le_next != NULL) {    \
+        (listelm)->field.le_prev = &((elm)->field.le_next);    \
+    }   \
+    (listelm)->field.le_next = (elm);   \
+    (elm)->field.le_prev = &((listelm)->field.le_next); \
+} while (0)
+
+// Note: assign a to b <==> a = b
         //Step 1, assign elm.next to listelem.next.
-        //Step 2: Judge whether listelm.next is NULL, if not, then assign listelm.pre to a proper value.
+        //Step 2: Judge whether listelm.next is NULL, if not, then assign listelm.next.pre to a proper value.
         //step 3: Assign listelm.next to a proper value.
         //step 4: Assign elm.pre to a proper value.
 
@@ -144,7 +152,22 @@
  * The "field" name is the link element as above. You can refer to LIST_INSERT_HEAD.
  * Note: this function has big differences with LIST_INSERT_HEAD !
  */
-#define LIST_INSERT_TAIL(head, elm, field)
+#define LIST_INSERT_TAIL(head, elm, field) do { \
+    for ((elm).field->le_next = LIST_FIRST((head)) ; \
+            (((elm).field->le_next) != NULL && (elm).field->le_next).field->le_next != NULL; \
+            ((elm).field->le_next) = ((elm).field->le_next).field->le_next);    \
+    ((elm).field->le_next).field->le_next = (elm);                      \
+    (elm).field->le_prev = &(((elm).field->le_next).field->le_next);    \
+    (elm).field->le_next = NULL;    \
+} while (0)
+// 1. find the exists last node of the link list
+//    now the elm.next == tail
+// 2. tail.next = elm;
+// 3. elm.prev = &tail.next;
+// 4. elm.next = null;
+
+
+
 /* finish your code here. */
 
 
