@@ -291,7 +291,7 @@ void get_page_status(int pa) {
         panic("^^^^^ WTF ^^^^^");
     }
     
-    // printf("times:%d, page status:%d\n");
+    printf("times:%d, page status:%d\n", times_var1, status_var2);
     times_var1++;
 
 }
