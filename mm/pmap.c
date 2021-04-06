@@ -257,10 +257,9 @@ page_alloc2(struct Page **pp)
     pa = page2pa(ppage_temp);
 
     // ^^^ assertion for printf ^^^
-    if (ppn >= 0x80000000 || pa >= 0x80000000) {
+    /*if (ppn >= 0x80000000 || pa >= 0x80000000) {
         panic("^^^^^^ TOO HIGH ^^^^^^");
-    }
-
+    }*/
 
     printf("page number is %x, start from pa %x\n", ppn, pa);
     
@@ -292,7 +291,7 @@ void get_page_status(int pa) {
         panic("^^^^^ WTF ^^^^^");
     }
     
-    printf("times:%d, page status:%d\n");
+    // printf("times:%d, page status:%d\n");
     times_var1++;
 
 }
