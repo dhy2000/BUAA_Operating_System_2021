@@ -21,7 +21,7 @@ static struct Page_list page_free_list;	/* Free list of physical pages */
 /* ^^^^^^ BITMAP START ^^^^^^ */
 
 // npage
-#define LAB2_1_EXTRA_NUM (16384/sizeof(unsigned int))
+#define LAB2_1_EXTRA_NUM (16384/32)
 #define ARRAY_LEN(a) (sizeof((a))/sizeof((a)[0]))
 
 unsigned int page_bitmap[LAB2_1_EXTRA_NUM];
