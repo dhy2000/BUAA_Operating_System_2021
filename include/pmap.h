@@ -107,5 +107,7 @@ int page_alloc2(struct Page **pp);
 void test_queue(); // for strong test
 void pm_check(); // for strong test
 
+void get_page_status(int pa);
+
 
 #endif /* _PMAP_H_ */
