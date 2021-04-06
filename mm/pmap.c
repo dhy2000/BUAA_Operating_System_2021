@@ -214,6 +214,7 @@ page_init(void)
     for (; i < npage; i++) {
         BITMAP_SETLO(i);
     }
+    printf("page bitmap size is %x\n", ARRAY_LEN(page_bitmap));
 }
 
 /*Overview:
