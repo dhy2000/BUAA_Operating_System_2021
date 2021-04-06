@@ -102,5 +102,10 @@ void boot_map_segment(Pde *pgdir, u_long va, u_long size, u_long pa, int perm);
 
 extern struct Page *pages;
 
+// ^^^^^^^ FOR LAB2-1 EXAM ^^^^^^^
+int page_alloc2(struct Page **pp);
+void test_queue(); // for strong test
+void pm_check(); // for strong test
+
 
 #endif /* _PMAP_H_ */

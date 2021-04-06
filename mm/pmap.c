@@ -231,6 +231,67 @@ page_alloc(struct Page **pp)
     return 0;
 }
 
+/* ^^^^^^ For Lab2-1 Exam ^^^^^^ */
+
+int
+page_alloc2(struct Page **pp)
+{
+    struct Page *ppage_temp;
+    
+    u_long ppn, pa;
+
+    /* Step 1: Get a page from free memory. If fails, return the error code.*/
+    if (LIST_FIRST(&page_free_list) == NULL) {
+        return -E_NO_MEM;
+    }
+    ppage_temp = LIST_FIRST(&page_free_list);
+    LIST_REMOVE(ppage_temp, pp_link);
+
+    /* Step 2: Initialize this page.
+     * Hint: use `bzero`. */
+    bzero((void*)(page2kva(ppage_temp)), BY2PG);
+    ppage_temp->pp_ref = 0;
+    *pp = ppage_temp;
+
+    ppn = page2ppn(ppage_temp);
+    pa = page2pa(ppage_temp);
+
+    printf("page number is %x, start from pa %x\n", ppn, pa);
+
+    return 0;
+}
+
+int times_var1 = 1;
+
+void get_page_status(int pa) {
+    struct Page * pp = pa2page(pa);
+    unsigned char isFree = 0;
+    struct Page * pvar;
+
+    int status_var2 = 0;
+
+    LIST_FOREACH((pvar), (&page_free_list), pp_link) {
+        if (pvar == pp) {
+            isFree = 1;
+            break;
+        }
+    }
+    if (isFree) {
+        status_var2 = 3;
+    } else if (pp->pp_ref == 0) {
+        status_var2 = 2;
+    } else if (pp->pp_ref > 0) {
+        status_var2 = 1;
+    } else {
+        panic("^^^^^ WTF ^^^^^");
+    }
+    
+    printf("times:%d, page status:%d\n");
+    times_var1++;
+
+}
+
+
 /*Overview:
 	Release a page, mark it as free if it's `pp_ref` reaches 0.
   Hint:
