@@ -214,7 +214,7 @@ page_init(void)
     for (; i < npage; i++) {
         BITMAP_SETLO(i);
     }
-    printf("page bitmap size is %x\n", ARRAY_LEN(page_bitmap));
+    // printf("page bitmap size is %x\n", ARRAY_LEN(page_bitmap));
 }
 
 /*Overview:
@@ -247,7 +247,7 @@ page_alloc(struct Page **pp)
     LIST_REMOVE(ppage_temp, pp_link);
     */
 
-    for (i = 0; i < ARRAY_LEN(page_bitmap); i++) {
+    for (i = 0; i < npage; i++) {
         if (!BITMAP_READ(i)) {
             flg = 1;
             break;
