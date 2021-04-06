@@ -102,5 +102,8 @@ void boot_map_segment(Pde *pgdir, u_long va, u_long size, u_long pa, int perm);
 
 extern struct Page *pages;
 
+// ^^^^^^ FOR LAB2-1 EXTRA ^^^^^^ 
+void pm_check(void);
+
 
 #endif /* _PMAP_H_ */

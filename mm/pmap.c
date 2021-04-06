@@ -18,6 +18,19 @@ static u_long freemem;
 
 static struct Page_list page_free_list;	/* Free list of physical pages */
 
+/* ^^^^^^ BITMAP START ^^^^^^ */
+
+// npage
+#define LAB2_1_EXTRA_NUM (16384/sizeof(unsigned int))
+#define ARRAY_LEN(a) (sizeof((a))/sizeof((a)[0]))
+
+unsigned int page_bitmap[LAB2_1_EXTRA_NUM];
+
+#define BITMAP_READ(idx) ( !! ( page_bitmap[ (((unsigned int)idx) >> 5) ] & ( 1U << ( (idx) & 0x1F ) ) ) )
+#define BITMAP_SETHI(idx) ( page_bitmap[ (((unsigned int)idx) >> 5) ] |= ( 1U << ( (idx) & 0x1F ) ) )
+#define BITMAP_SETLO(idx) ( page_bitmap[ (((unsigned int)idx) >> 5) ] &= ( ~( 1U << ( (idx) & 0x1F ) ) ) )
+
+/* ^^^^^^ BITMAP END ^^^^^^ */
 
 /* Overview:
  	Initialize basemem and npage.
@@ -175,25 +188,31 @@ void mips_vm_init()
 void
 page_init(void)
 {
+    int i = 0;
     /* Step 1: Initialize page_free_list. */
     /* Hint: Use macro `LIST_INIT` defined in include/queue.h. */
-    LIST_INIT(&page_free_list); 
+    // LIST_INIT(&page_free_list); 
+    
+    for (i = 0; i < ARRAY_LEN(page_bitmap); i++) 
+        page_bitmap[i] = 0xFFFFFFFF; // all used
+    
 
     /* Step 2: Align `freemem` up to multiple of BY2PG. */
     freemem = ROUND(freemem, BY2PG);
 
     /* Step 3: Mark all memory blow `freemem` as used(set `pp_ref`
      * filed to 1) */
-    int npage = PADDR(freemem) / BY2PG;
-    int i = 0;
-    for (; i < npage; i++) {
+    int np = PADDR(freemem) / BY2PG;
+    for (i = 0; i < np; i++) {
         pa2page((i * BY2PG))->pp_ref = 1;
     }
 
     /* Step 4: Mark the other memory as free. */
-    int addr = PADDR(freemem);
-    for (; addr < maxpa; addr += BY2PG) {
-        LIST_INSERT_HEAD(&page_free_list, pa2page(addr), pp_link); 
+    // int addr = PADDR(freemem);
+    // for (; addr < maxpa; addr += BY2PG) {
+        // LIST_INSERT_HEAD(&page_free_list, pa2page(addr), pp_link); 
+    for (; i < npage; i++) {
+        BITMAP_SETLO(i);
     }
 }
 
@@ -214,14 +233,30 @@ page_init(void)
 int
 page_alloc(struct Page **pp)
 {
+    int i = 0;
+    unsigned char flg = 0;
     struct Page *ppage_temp;
 
     /* Step 1: Get a page from free memory. If fails, return the error code.*/
+    /*
     if (LIST_FIRST(&page_free_list) == NULL) {
         return -E_NO_MEM;
     }
     ppage_temp = LIST_FIRST(&page_free_list);
     LIST_REMOVE(ppage_temp, pp_link);
+    */
+
+    for (i = 0; i < ARRAY_LEN(page_bitmap); i++) {
+        if (!BITMAP_READ(i)) {
+            flg = 1;
+            break;
+        }
+    }
+    if (flg == 0) {
+        return -E_NO_MEM;
+    }
+    ppage_temp = &pages[i];
+    BITMAP_SETHI(i);
 
     /* Step 2: Initialize this page.
      * Hint: use `bzero`. */
@@ -238,13 +273,16 @@ page_alloc(struct Page **pp)
 void
 page_free(struct Page *pp)
 {
+    unsigned int ppn;
     /* Step 1: If there's still virtual address refers to this page, do nothing. */
     if (pp->pp_ref > 0) 
         return;
 
     /* Step 2: If the `pp_ref` reaches to 0, mark this page as free and return. */
     else if (pp->pp_ref == 0) {
-        LIST_INSERT_HEAD(&page_free_list, pp, pp_link);
+        // LIST_INSERT_HEAD(&page_free_list, pp, pp_link);
+        ppn = page2ppn(pp);
+        BITMAP_SETLO(ppn);
         return;
     }
 
