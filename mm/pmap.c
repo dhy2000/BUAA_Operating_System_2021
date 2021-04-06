@@ -256,7 +256,9 @@ page_alloc2(struct Page **pp)
     ppn = page2ppn(ppage_temp);
     pa = page2pa(ppage_temp);
 
-    printf("page number is %x, start from pa %x\n", ppn, pa);
+    // printf("page number is %x, start from pa %x\n", ppn, pa);
+    
+    printf("test_fail\n");
 
     return 0;
 }
