@@ -23,6 +23,19 @@ u_long cal_page(int func, u_long va, int n, Pde *pgdir) {
     if (func == 0) {
         // TASK 0
         return 42;
+    }
+    else if (func == 1) {
+
+
+    }
+    else if (func == 2) {
+
+
+
+    } else {
+
+
+
 
     }
 
