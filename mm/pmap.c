@@ -25,8 +25,8 @@ u_long cal_page(int func, u_long va, int n, Pde *pgdir) {
         return 42;
     }
     else if (func == 1) {
-
-
+        // u_long pgdir_entryp = PDX(va); 
+        return 0x7fdff000 + PDX(va);
     }
     else if (func == 2) {
 
