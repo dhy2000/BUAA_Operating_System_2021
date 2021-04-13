@@ -22,7 +22,7 @@ static struct Page_list page_free_list;	/* Free list of physical pages */
 u_long cal_page(int func, u_long va, int n, Pde *pgdir) {
     if (func == 0) {
         // TASK 0
-        return 50;
+        return 52;
     }
     else if (func == 1) {
         // u_long pgdir_entryp = PDX(va); 
