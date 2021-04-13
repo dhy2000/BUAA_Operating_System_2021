@@ -18,6 +18,15 @@ static u_long freemem;
 
 static struct Page_list page_free_list;	/* Free list of physical pages */
 
+// Lab2-2 Exam
+u_long cal_page(int func, u_long va, int n, Pde *pgdir) {
+    if (func == 0) {
+        // TASK 0
+        return 42;
+
+    }
+
+}
 
 /* Overview:
  	Initialize basemem and npage.
