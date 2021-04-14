@@ -61,6 +61,11 @@ int envid2env(u_int envid, struct Env **penv, int checkperm)
     /* Hint: If envid is zero, return curenv.*/
     /*Step 1: Assign value to e using envid. */
 
+    if (envid == 0) {
+        e = curenv;
+    } else {
+        e = envs[ENVX(envid)];
+    }
 
 
     if (e->env_status == ENV_FREE || e->env_id != envid) {
@@ -76,7 +81,13 @@ int envid2env(u_int envid, struct Env **penv, int checkperm)
      *     If not, error! */
     /*     Step 2: Make a check according to checkperm. */
 
-
+    if (checkperm) {
+        // inverse the condition
+        if (!(e == curenv || e->env_parent_id == envid)) {
+            *penv = 0;
+            return -E_BAD_ENV;
+        }
+    }
 
 
     *penv = e;
@@ -97,14 +108,17 @@ env_init(void)
 {
     int i;
     /*Step 1: Initial env_free_list. */
-
+    LIST_INIT(&env_free_list);
 
     /*Step 2: Traverse the elements of 'envs' array,
      * set their status as free and insert them into the env_free_list.
      * Choose the correct loop order to finish the insertion.
      * Make sure, after the insertion, the order of envs in the list
      * should be the same as it in the envs array. */
-
+    for (i = NENV - 1; i >= 0; i--) {
+        envs[i].env_status = ENV_FREE;
+        LIST_INSERT_HEAD(&env_free_list, &env[i], env_link);
+    }
 
 }
 
@@ -182,7 +196,7 @@ env_alloc(struct Env **new, u_int parent_id)
     struct Env *e;
 
     /*Step 1: Get a new Env from env_free_list*/
-
+    e = LIST_FIRST(&env_free_list);
 
     /*Step 2: Call certain function(has been completed just now) to init kernel memory layout for this new Env.
      *The function mainly maps the kernel address to this new Env address. */
@@ -196,7 +210,7 @@ env_alloc(struct Env **new, u_int parent_id)
 
 
     /*Step 5: Remove the new Env from env_free_list. */
-
+    LIST_REMOVE(e, env_link);
 
 }
 
