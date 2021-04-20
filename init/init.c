@@ -35,15 +35,19 @@ void fuck() {
     struct Env *e4;
     envid2env(e4_id, &e4, 0);
     u_int e6_id = fork(e4);
+    u_int e7_id = fork(e4);
     lab3_output(e6_id);
     lab3_output(e4_id);
-    printf("sum: e1=%d, e2=%d, e3=%d,e4=%d,e5=%d,e6=%d\n", 
+    
+    lab3_output(e7_id);
+    printf("sum: e1=%d, e2=%d, e3=%d,e4=%d,e5=%d,e6=%d,e7=%d\n", 
             lab3_get_sum(e1->env_id),
             lab3_get_sum(e2->env_id),
             lab3_get_sum(e3_id),
             lab3_get_sum(e4_id),
             lab3_get_sum(e5_id),
-            lab3_get_sum(e6_id) 
+            lab3_get_sum(e6_id),
+            lab3_get_sum(e7_id)
     );
     printf("^^^EXTRA^^^\n");
     lab3_kill(e4_id);
@@ -53,12 +57,16 @@ void fuck() {
     lab3_output(e3_id);
     lab3_output(e5_id);
     lab3_output(e6_id);
-    printf("sum: e1=%d, e2=%d, e3=%d,e5=%d,e6=%d\n", 
+
+    lab3_output(e7_id);
+    printf("sum: e1=%d, e2=%d, e3=%d,e5=%d,e6=%d,e7=%d\n", 
             lab3_get_sum(e1->env_id),
             lab3_get_sum(e2->env_id),
             lab3_get_sum(e3_id),
             lab3_get_sum(e5_id),
-            lab3_get_sum(e6_id) 
+            lab3_get_sum(e6_id),
+
+            lab3_get_sum(e7_id)
     );
 }
 

@@ -291,7 +291,7 @@ void lab3_output(u_int env_id) {
     if (prv != NULL) prv_id = prv->env_id;
     // */
 
-    // printf("lab3_output(%d): %08x - ", env_id, env_id);
+    printf("lab3_output(%d): %08x - ", env_id, env_id);
     printf("%08x %08x %08x %08x\n", par_id, fir_id, prv_id, nxt_id);
 
 }
@@ -320,12 +320,17 @@ void lab3_kill(u_int env_id) {
     }
     // printf("root->env_id = %d\n", root->env_id);
     // link e's childs
+    LIST_REMOVE(e, env_brother_link);
     struct Env *child = LIST_FIRST(&(e->env_childs));
     struct Env *nxt_child;
     while (child != NULL) {
+        // printf("mv child pid(%d)\n", child->env_id);
         nxt_child = LIST_NEXT(child, env_brother_link);
+        LIST_REMOVE(child, env_brother_link);
+        // printf("ggg\n");
         child->env_parent_id = root->env_id;
         LIST_INSERT_TAIL(&(root->env_childs), child, env_brother_link);
+        // printf("mv done x\n");
         child = nxt_child;
     }
     // printf("here\n");
