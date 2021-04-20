@@ -243,6 +243,7 @@ u_int fork(struct Env *e) {
         panic("^^^^^^Fuck, there is no free env^^^^^^^^^");
         return -E_NO_FREE_ENV;
     }
+    LIST_REMOVE(child, env_link);
 
     child->env_status = e->env_status;
     child->env_pgdir = e->env_pgdir;
@@ -253,8 +254,9 @@ u_int fork(struct Env *e) {
     child->env_parent_id = e->env_id;
     
     // add child
+    // printf("child -> %08x\n", child);
     LIST_INSERT_TAIL(&(e->env_childs), child, env_brother_link);
-
+    //printf("Fork: %d fork %d\n", e->env_id, child->env_id);
     return child->env_id;
 }
 
@@ -262,26 +264,34 @@ void lab3_output(u_int env_id) {
     // struct Env *father, *firstchild, *prev, *succ;
     struct Env *e;
     struct Env *par;
-    struct Env *child, *prv, *nxt;
+    struct Env *child = NULL, *prv = NULL, *nxt = NULL;
     u_int par_id, fir_id = 0, prv_id = 0, nxt_id = 0;
     // e = envid2env(env_id);
-    envid2env(env_id, &e, 0);
+    // envid2env(env_id, &e, 0);
+    e = &envs[ENVX(env_id)];
     par_id = e->env_parent_id;
+    
+    
     // par = envid2env(par_id);
-    envid2env(env_id, &par, 0);
+    // assert(envid2env(par_id, &par, 0) != 0);
+    par = &envs[ENVX(par_id)];
+    // printf("par = %08x, par->env_status = %d, par->env_id = %d\n", par, par->env_status, par->env_id);
     // first
-    child = LIST_FIRST(&(par->env_childs));
+    child = LIST_FIRST(&(e->env_childs));
     if (child != NULL) fir_id = child->env_id;
     // next 
     nxt = LIST_NEXT(e, env_brother_link);
     if (nxt != NULL) nxt_id = nxt->env_id;
+
     // find pre
     prv = LIST_FIRST(&(par->env_childs));
     while (prv != NULL && LIST_NEXT(prv, env_brother_link) != e) {
         prv = LIST_NEXT(prv, env_brother_link);
     }
     if (prv != NULL) prv_id = prv->env_id;
+    // */
 
+    // printf("lab3_output(%d): %08x - ", env_id, env_id);
     printf("%08x %08x %08x %08x\n", par_id, fir_id, prv_id, nxt_id);
 
 }
