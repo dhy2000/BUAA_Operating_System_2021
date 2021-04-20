@@ -164,6 +164,7 @@
     else {  \
         LIST_FIRST(head) = elm; \
         (elm)->field.le_next = NULL;    \
+        (elm)->field.le_prev = &LIST_FIRST(head); \
     }   \
 } while (0)
 // 1. find the exists last node of the link list
