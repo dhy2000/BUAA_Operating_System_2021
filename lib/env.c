@@ -310,6 +310,28 @@ int lab3_get_sum(u_int env_id) {
 }
 
 
+void lab3_kill(u_int env_id) {
+    // find the root of tree
+    struct Env *e = &envs[ENVX(env_id)];
+    struct Env *root = e;
+    while (root->env_parent_id != 0) {
+        u_int fa_id = root->env_parent_id;
+        root = &envs[ENVX(fa_id)];
+    }
+    // link e's childs
+    struct Env *child = LIST_FIRST(&(e->env_childs));
+    struct Env *nxt_child;
+    while (child != NULL) {
+        nxt_child = LIST_NEXT(child, env_brother_link);
+        child->env_parent_id = root->env_id;
+        LIST_INSERT_TAIL(&(root->env_childs), child, env_brother_link);
+        child = nxt_child;
+    }
+    // kill itself
+    e->env_status = ENV_FREE;
+    LIST_INSERT_HEAD(&env_free_list, e, env_link);
+    LIST_REMOVE(e, env_sched_link);
+}
 
 /* Overview:
  *   This is a call back function for kernel's elf loader.
