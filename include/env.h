@@ -18,6 +18,8 @@
 #define ENV_RUNNABLE		1
 #define ENV_NOT_RUNNABLE	2
 
+LIST_HEAD(Env_list, Env);
+
 struct Env {
 	struct Trapframe env_tf;        // Saved registers
 	LIST_ENTRY(Env) env_link;       // Free list
@@ -28,6 +30,11 @@ struct Env {
 	u_int env_cr3;
 	LIST_ENTRY(Env) env_sched_link;
         u_int env_pri;
+
+    // ^^^^^^ Exam ^^^^^^
+    LIST_ENTRY(Env) env_brother_link; // brother list
+    struct Env_list env_childs; // childs
+
 	// Lab 4 IPC
 	u_int env_ipc_value;            // data value sent to us 
 	u_int env_ipc_from;             // envid of the sender  
@@ -44,7 +51,6 @@ struct Env {
 	u_int env_nop;                  // align to avoid mul instruction
 };
 
-LIST_HEAD(Env_list, Env);
 extern struct Env *envs;		// All environments
 extern struct Env *curenv;	        // the current env
 extern struct Env_list env_sched_list[2]; // runnable env list
@@ -61,6 +67,7 @@ void env_run(struct Env *e);
 
 // ^^^^^^^^^^ exam ^^^^^^^^^^^^^^^
 u_int fork(struct Env *e);
+void lab3_output(u_int env_id);
 
 // for the grading script
 #define ENV_CREATE2(x, y) \
