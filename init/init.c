@@ -47,7 +47,12 @@ void fuck() {
     );
     printf("^^^EXTRA^^^\n");
     lab3_kill(e4_id);
-
+    
+    lab3_output(e1->env_id);
+    lab3_output(e2->env_id);
+    lab3_output(e3_id);
+    lab3_output(e5_id);
+    lab3_output(e6_id);
     printf("sum: e1=%d, e2=%d, e3=%d,e5=%d,e6=%d\n", 
             lab3_get_sum(e1->env_id),
             lab3_get_sum(e2->env_id),
