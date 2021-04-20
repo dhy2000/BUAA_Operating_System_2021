@@ -318,6 +318,7 @@ void lab3_kill(u_int env_id) {
         u_int fa_id = root->env_parent_id;
         root = &envs[ENVX(fa_id)];
     }
+    printf("root->env_id = %d\n", root->env_id);
     // link e's childs
     struct Env *child = LIST_FIRST(&(e->env_childs));
     struct Env *nxt_child;
@@ -327,10 +328,12 @@ void lab3_kill(u_int env_id) {
         LIST_INSERT_TAIL(&(root->env_childs), child, env_brother_link);
         child = nxt_child;
     }
+    printf("here\n");
     // kill itself
     e->env_status = ENV_FREE;
     LIST_INSERT_HEAD(&env_free_list, e, env_link);
-    LIST_REMOVE(e, env_sched_link);
+    // LIST_REMOVE(e, env_sched_link);
+    printf("finish\n");
 }
 
 /* Overview:
