@@ -291,7 +291,7 @@ void lab3_output(u_int env_id) {
     if (prv != NULL) prv_id = prv->env_id;
     // */
 
-    printf("lab3_output(%d): %08x - ", env_id, env_id);
+    // printf("lab3_output(%d): %08x - ", env_id, env_id);
     printf("%08x %08x %08x %08x\n", par_id, fir_id, prv_id, nxt_id);
 
 }
