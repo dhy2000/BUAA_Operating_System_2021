@@ -297,6 +297,20 @@ void lab3_output(u_int env_id) {
 }
 
 
+int lab3_get_sum(u_int env_id) {
+    // recursive
+    struct Env *e;
+    e = &envs[ENVX(env_id)];
+    struct Env *child = LIST_FIRST(&(e->env_childs));
+    int cnt = 1;
+    for (; child != NULL; child = LIST_NEXT(child, env_brother_link)) {
+        cnt += lab3_get_sum(child->env_id);
+    }
+    return cnt;
+}
+
+
+
 /* Overview:
  *   This is a call back function for kernel's elf loader.
  * Elf loader extracts each segment of the given binary image.

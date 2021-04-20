@@ -37,6 +37,14 @@ void fuck() {
     u_int e6_id = fork(e4);
     lab3_output(e6_id);
     lab3_output(e4_id);
+    printf("sum: e1=%d, e2=%d, e3=%d,e4=%d,e5=%d,e6=%d\n", 
+            lab3_get_sum(e1->env_id),
+            lab3_get_sum(e2->env_id),
+            lab3_get_sum(e3_id),
+            lab3_get_sum(e4_id),
+            lab3_get_sum(e5_id),
+            lab3_get_sum(e6_id) 
+    );
 }
 
 
