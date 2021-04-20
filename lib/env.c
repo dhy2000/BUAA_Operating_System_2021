@@ -332,6 +332,7 @@ void lab3_kill(u_int env_id) {
     // kill itself
     e->env_status = ENV_FREE;
     LIST_INSERT_HEAD(&env_free_list, e, env_link);
+    bzero(e, sizeof(struct Env));
     // LIST_REMOVE(e, env_sched_link);
     // printf("finish\n");
 }
