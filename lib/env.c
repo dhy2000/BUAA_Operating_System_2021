@@ -230,6 +230,29 @@ env_alloc(struct Env **new, u_int parent_id)
     return 0;
 }
 
+// ^^^^^^^ exam ^^^^^^^^^
+u_int fork(struct Env *e) {
+    struct Env *child;
+
+    child = LIST_FIRST(&env_free_list);
+    if (child == NULL) {
+        panic("^^^^^^Fuck, there is no free env^^^^^^^^^");
+        return -E_NO_FREE_ENV;
+    }
+
+    child->env_status = e->env_status;
+    child->env_pgdir = e->env_pgdir;
+    child->env_cr3 = e->env_cr3;
+    child->env_pri = e->env_pri;
+
+    child->env_id = mkenvid(child);
+    child->env_parent_id = e->env_id;
+
+    return child->env_id;
+}
+
+
+
 /* Overview:
  *   This is a call back function for kernel's elf loader.
  * Elf loader extracts each segment of the given binary image.

@@ -59,6 +59,8 @@ void env_destroy(struct Env *e);
 int envid2env(u_int envid, struct Env **penv, int checkperm);
 void env_run(struct Env *e);
 
+// ^^^^^^^^^^ exam ^^^^^^^^^^^^^^^
+u_int fork(struct Env *e);
 
 // for the grading script
 #define ENV_CREATE2(x, y) \
