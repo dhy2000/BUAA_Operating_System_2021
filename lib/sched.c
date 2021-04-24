@@ -31,10 +31,10 @@ void sched_yield(void)
      */
     struct Env *nenv;
 
-    count--;
+    // count--;
     if (count == 0 || curenv == NULL) {
         if (curenv != NULL) {
-            LIST_INSERT_HEAD(&env_sched_list[!point], curenv, env_sched_link);
+            LIST_INSERT_TAIL(&env_sched_list[!point], curenv, env_sched_link);
         }
         if (LIST_EMPTY(&env_sched_list[point])) {
             point = !point;        
@@ -46,6 +46,7 @@ void sched_yield(void)
             env_run(nenv);
         }
     }
+    count--;
     env_run(curenv);
     panic("^^^^^^sched end^^^^^^");
 }
