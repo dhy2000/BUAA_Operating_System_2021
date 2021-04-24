@@ -14,7 +14,7 @@
 /*** exercise 3.14 ***/
 void sched_yield(void)
 {
-    static int count = 0; // remaining time slices of current env
+    static int count = 1; // remaining time slices of current env
     static int point = 0; // current env_sched_list index
     
     /*  hint:
@@ -31,7 +31,7 @@ void sched_yield(void)
      */
     struct Env *nenv;
 
-    // count--;
+    count--;
     if (count == 0 || curenv == NULL) {
         if (curenv != NULL) {
             LIST_INSERT_TAIL(&env_sched_list[!point], curenv, env_sched_link);
@@ -46,7 +46,6 @@ void sched_yield(void)
             env_run(nenv);
         }
     }
-    count--;
     env_run(curenv);
     panic("^^^^^^sched end^^^^^^");
 }
