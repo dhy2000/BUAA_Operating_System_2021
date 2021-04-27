@@ -29,8 +29,8 @@ void sched_yield(void)
      *  functions or macros below may be used (not all):
      *  LIST_INSERT_TAIL, LIST_REMOVE, LIST_FIRST, LIST_EMPTY
      */
-    struct Env *nenv;
-
+    
+    /*
     count--;
     if (count == 0 || curenv == NULL) {
         if (curenv != NULL) {
@@ -47,5 +47,39 @@ void sched_yield(void)
         }
     }
     env_run(curenv);
+    */
+    
+    // ^^^^^^EXAM^^^^^^
+    // unsigned int func1, func2, func3;
+    // unsigned int pri;
+    
+#define PRI(env) ( ((env)->env_pri) & 0x7F )
+#define FUNC1(env) ( ( ((env)->env_pri) >> 8 ) & 0x7F )
+#define FUNC2(env) ( ( ((env)->env_pri) >> 16 ) & 0x7F )
+#define FUNC3(env) ( ( ((env)->env_pri) >> 24 ) & 0x7F )
+
+
+    struct Env *env;
+    struct Env *nextEnv = NULL;
+    // count--;
+    if (curenv != NULL) {
+        LIST_INSERT_TAIL(&env_sched_list[0], curenv, env_sched_link);
+    }
+    if (LIST_EMPTY(&env_sched_list[0])) {
+        panic("^^^^^^WWL HAOZIWEIZHI^^^^^^^^^^");
+    }
+    u_int max_pri = 0;
+    LIST_FOREACH(env, &env_sched_list[0], env_sched_link) {
+        if (env->env_status == ENV_RUNNABLE && PRI(env) >= max_pri) {
+            nextEnv = env;
+            max_pri = PRI(env);
+        }
+    }
+    if (nextEnv == NULL) {
+        panic("^^^^^^Jiwushiyan Biss^^^^^^^^^");
+    }
+    LIST_REMOVE(nextEnv, env_sched_link);
+    env_run(nextEnv);
+
     panic("^^^^^^sched end^^^^^^");
 }
