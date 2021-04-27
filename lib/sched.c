@@ -50,8 +50,8 @@ void sched_yield(void)
     */
     
     // ^^^^^^EXAM^^^^^^
-    // unsigned int func1, func2, func3;
-    // unsigned int pri;
+    unsigned int func1 = 0, func2 = 0, func3 = 0;
+    unsigned int pri = 0;
     
 #define PRI(env) ( ((env)->env_pri) & 0x7F )
 #define FUNC1(env) ( ( ((env)->env_pri) >> 8 ) & 0x7F )
@@ -63,6 +63,18 @@ void sched_yield(void)
     struct Env *nextEnv = NULL;
     // count--;
     if (curenv != NULL) {
+        // part2
+        if (FUNC1(curenv) > 0) {
+            func1 = FUNC1(curenv);
+            // curenv->env_pri -= FUNC1(curenv);
+            pri = PRI(curenv);
+            if (pri >= func1) {
+                curenv->env_pri -= func1;
+            } else {
+                curenv->env_pri -= pri;
+            }
+        }
+        
         LIST_INSERT_TAIL(&env_sched_list[0], curenv, env_sched_link);
     }
     if (LIST_EMPTY(&env_sched_list[0])) {
