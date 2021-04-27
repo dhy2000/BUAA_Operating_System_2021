@@ -63,6 +63,13 @@ void sched_yield(void)
     struct Env *nextEnv = NULL;
     // count--;
     if (curenv != NULL) {
+        // extra
+        func2 = FUNC2(curenv);
+        if (count == func2) {
+            curenv->env_status = ENV_NOT_RUNNABLE;
+            curenv->trigRunnable = func2 + FUNC3(curenv);
+            // will insert into tail of sched list
+        }
         // part2
         if (FUNC1(curenv) > 0) {
             func1 = FUNC1(curenv);
@@ -82,6 +89,12 @@ void sched_yield(void)
     }
     u_int max_pri = 0;
     LIST_FOREACH(env, &env_sched_list[0], env_sched_link) {
+        // restore zombie process
+        if (env->env_status == ENV_NOT_RUNNABLE && env->trigRunnable >= count) {
+            env->trigRunnable = 0;
+            env->env_status = ENV_RUNNABLE;
+        }
+        // schedule
         if (env->env_status == ENV_RUNNABLE && PRI(env) >= max_pri) {
             nextEnv = env;
             max_pri = PRI(env);
