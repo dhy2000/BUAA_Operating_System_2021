@@ -62,16 +62,18 @@ void sched_yield(void)
     struct Env *env;
     struct Env *nextEnv = NULL;
     // count--;
+    // printf("sched_yield %d\n", count);
     if (curenv != NULL) {
         // extra
         func2 = FUNC2(curenv);
         if (count == func2) {
             curenv->env_status = ENV_NOT_RUNNABLE;
-            curenv->trigRunnable = func2 + FUNC3(curenv);
+            curenv->trigRunnable = func2 + FUNC3(curenv); 
+            // printf("curenv(%d) sleep until %d\n",curenv->env_id, curenv->trigRunnable);
             // will insert into tail of sched list
         }
         // part2
-        if (FUNC1(curenv) > 0) {
+        /*if (FUNC1(curenv) > 0) {
             func1 = FUNC1(curenv);
             // curenv->env_pri -= FUNC1(curenv);
             pri = PRI(curenv);
@@ -80,7 +82,7 @@ void sched_yield(void)
             } else {
                 curenv->env_pri -= pri;
             }
-        }
+        }*/
         
         LIST_INSERT_TAIL(&env_sched_list[0], curenv, env_sched_link);
     }
@@ -90,7 +92,8 @@ void sched_yield(void)
     u_int max_pri = 0;
     LIST_FOREACH(env, &env_sched_list[0], env_sched_link) {
         // restore zombie process
-        if (env->env_status == ENV_NOT_RUNNABLE && env->trigRunnable >= count) {
+        if (env->env_status == ENV_NOT_RUNNABLE && env->trigRunnable <= count) {
+            // printf("env(%d) wake up at %d\n",env->env_id, count);
             env->trigRunnable = 0;
             env->env_status = ENV_RUNNABLE;
         }
@@ -104,6 +107,7 @@ void sched_yield(void)
         panic("^^^^^^Jiwushiyan Biss^^^^^^^^^");
     }
     LIST_REMOVE(nextEnv, env_sched_link);
+    count++;
     env_run(nextEnv);
 
     panic("^^^^^^sched end^^^^^^");
