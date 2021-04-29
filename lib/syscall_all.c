@@ -68,6 +68,8 @@ u_int sys_getenvid(void)
 /*** exercise 4.6 ***/
 void sys_yield(void)
 {
+    bcopy((void*)(KERNEL_SP - sizeof(struct Trapframe)), (void*)(TIMESTACK - sizeof(struct Trapframe)), sizeof(struct Trapframe));
+    sched_yield();
 }
 
 /* Overview:
