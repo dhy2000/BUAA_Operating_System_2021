@@ -20,7 +20,7 @@ NESTED(handle_sys,TF_SIZE, sp)
     /* if bd, real instr is at epc+4 */
     bnez    t1, PART1_STORE_BACK
     nop
-    addiu   t1, t1, 4 /* real exception instruction */
+    addiu   t0, t0, 4 /* real exception instruction */
 
 PART1_STORE_BACK:
     sw      t0, TF_EPC(sp)
