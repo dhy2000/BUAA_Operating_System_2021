@@ -1,4 +1,5 @@
 #include "pageReplace.h"
+#pragma GCC optimize("Ofast")
 #include <cassert>
 #include <cstddef>
 #include <unordered_map>
