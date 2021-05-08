@@ -54,16 +54,17 @@ inline bool Page_Visit(u_int pg) {
 void pageReplace(long * physic_memory, long nwAdd) {
     static int count = 0;
     u_int pg = get_Page(nwAdd);
-    fprintf(stderr, "Addr %d, Page %d\n", nwAdd, pg);
+    // fprintf(stderr, "Addr %d, Page %d\n", nwAdd, pg);
     if (!Page_Visit(pg)) {
         if (count < MAX_PHY_PAGE) {
             physic_memory[count] = pg;
             nodes[pg].offset = count;
             List_Insert_Head(&nodes[pg]);
             count++;
-        } else {    
+        } else {
             // don't need to replace
             HNode *ndtail = Ltail;
+            assert(ndtail != &nhead);
             u_int rep_off = ndtail->offset;
             List_Remove(ndtail);
             nodes[pg].offset = rep_off;
@@ -72,4 +73,3 @@ void pageReplace(long * physic_memory, long nwAdd) {
         }
     }
 }
-
