@@ -152,7 +152,7 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 	struct Page *ppage;
 	int ret;
 	ret = 0;
-    
+    va = ROUNDDOWN(va, BY2PG);    
     if (va >= UTOP || (perm & PTE_COW) || !(perm & PTE_V)) {
         return -E_INVAL;
     }
@@ -201,7 +201,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	round_dstva = ROUNDDOWN(dstva, BY2PG);
 
     //your code here
-    if (srcva >= UTOP || dstva >= UTOP) {
+    if (round_srcva >= UTOP || round_dstva >= UTOP) {
         return -E_INVAL;
     }
     if (!(perm & PTE_V)) {
@@ -216,10 +216,13 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
     if (ppage == NULL) {
         return -E_INVAL;
     }
-    if ( (!(*ppte & PTE_R)) && (!!(perm & PTE_R))) {
+    /*if ( (!(*ppte & PTE_R)) && (!!(perm & PTE_R))) {
+        return -E_INVAL;
+    }*/
+    if (!((*ppte) & PTE_V)) {
         return -E_INVAL;
     }
-    ppage = pa2page(PTE_ADDR(*ppte));
+    // ppage = pa2page(PTE_ADDR(*ppte));
     ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm);
     RET_FAIL(ret)
     
@@ -242,7 +245,7 @@ int sys_mem_unmap(int sysno, u_int envid, u_int va)
 	// Your code here.
 	int ret;
 	struct Env *env;
-    
+    va = ROUNDDOWN(va, BY2PG);    
     if (va >= UTOP) {
         return -E_INVAL;
     }
