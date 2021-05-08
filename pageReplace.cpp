@@ -56,6 +56,12 @@ inline bool Page_Visit(u_int pg) {
 }
 
 void pageReplace(long * physic_memory, long nwAdd) {
+    static bool init = false;
+    if (!init) {
+        nodes[nhead].next = ntail;
+        nodes[ntail].prev = nhead;
+        init = true;
+    }
     static int count = 0;
     u_int pg = get_Page(nwAdd);
     // fprintf(stderr, "Addr %d, Page %d\n", nwAdd, pg);
