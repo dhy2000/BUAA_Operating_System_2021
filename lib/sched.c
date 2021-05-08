@@ -32,19 +32,56 @@ void sched_yield(void)
     struct Env *nenv;
 
     count--;
-    if (count == 0 || curenv == NULL) {
+    if (count == 0 || curenv == NULL || curenv->env_status != ENV_RUNNABLE) {
         if (curenv != NULL) {
             LIST_INSERT_TAIL(&env_sched_list[!point], curenv, env_sched_link);
         }
+        // detect have 1
+        u_int hav1 = 0;
+
         if (LIST_EMPTY(&env_sched_list[point])) {
-            point = !point;        
+            // point = !point; 
+            hav1 = 0;
+        } else {
+            nenv = LIST_FIRST(&env_sched_list[point]);
+            while (nenv != NULL) {
+                if (nenv->env_status == ENV_RUNNABLE) {
+                    hav1 = 1;
+                    break;
+                }
+                nenv = LIST_NEXT(nenv, env_sched_link);
+            }
         }
-        if (!LIST_EMPTY(&env_sched_list[point])) {
+        if (!hav1) {
+            point = !point;
+            u_int hav2 = 0;
+            if (LIST_EMPTY(&env_sched_list[point])) {
+                hav2 = 0;
+            } else {
+                nenv = LIST_FIRST(&env_sched_list[point]);
+                while (nenv != NULL) {
+                    if (nenv->env_status == ENV_RUNNABLE) {
+                        hav2 = 1;
+                        break;
+                    }
+                    nenv = LIST_NEXT(nenv, env_sched_link);
+                }
+            }
+            if (!hav2) {
+                panic("^^^^^^NO RUNNABLE ENV^^^^^^^^^");
+            }
+        }
+        LIST_REMOVE(nenv, env_sched_link);
+        count = nenv->env_pri;
+        env_run(nenv);
+
+        /* if (!LIST_EMPTY(&env_sched_list[point])) {
             nenv = LIST_FIRST(&env_sched_list[point]);
             LIST_REMOVE(nenv, env_sched_link);
             count = nenv->env_pri;
             env_run(nenv);
-        }
+        }*/
+
     }
     env_run(curenv);
     panic("^^^^^^sched end^^^^^^");
