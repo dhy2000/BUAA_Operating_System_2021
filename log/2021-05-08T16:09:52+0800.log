@@ -1,0 +1,9 @@
+Autotest: Begin at Sat May  8 16:09:52 CST 2021
+[32m[ found your pageReplace.cpp ][0m
+[32m[ compile successfully ][0m
+pageReplace: pageReplace.cpp:33: void List_Remove(HNode*): Assertion `hnode->valid' failed.
+bash: line 1:     9 Aborted                 (core dumped) ./pageReplace > /dev/null
+cat: test.out: No such file or directory
+[32m[ your results are as follows ][0m
+your algorithm is wrong
+something error when caculating cost and time[33m[01m[ You got 100 (of 100) this time. Sat May  8 16:10:49 CST 2021 ][0m
