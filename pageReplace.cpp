@@ -122,6 +122,7 @@ void pgreplace_lru(long *physic_memory, long nwAdd) {
     u_int pg = get_Page(nwAdd);
     if (count < MAX_PHY_PAGE) {
         physic_memory[count++] = pg;
+        nodes[pg].offset = count - 1;
         List_Insert_Head(&nodes[pg]);
     }
     if (!List_Visit(pg)) {
@@ -132,7 +133,7 @@ void pgreplace_lru(long *physic_memory, long nwAdd) {
 }
 
 // ****** Main *********
-static void (*pgreplace)(long *, long) = pgreplace_base;
+static void (*pgreplace)(long *, long) = pgreplace_lru;
 
 void pageReplace(long * physic_memory, long nwAdd) {
     pgreplace(physic_memory, nwAdd);
