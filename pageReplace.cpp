@@ -132,7 +132,7 @@ void pgreplace_lru(long *physic_memory, long nwAdd) {
 }
 
 // ****** Main *********
-static void (*pgreplace)(long *, long) = pgreplace_lru;
+static void (*pgreplace)(long *, long) = pgreplace_base;
 
 void pageReplace(long * physic_memory, long nwAdd) {
     pgreplace(physic_memory, nwAdd);
