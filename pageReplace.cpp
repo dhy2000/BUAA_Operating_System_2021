@@ -1,4 +1,5 @@
 #include "pageReplace.h"
+#include <cstdio>
 #include <cassert>
 #include <cstddef>
 
@@ -53,6 +54,7 @@ inline bool Page_Visit(u_int pg) {
 void pageReplace(long * physic_memory, long nwAdd) {
     static int count = 0;
     u_int pg = get_Page(nwAdd);
+    fprintf(stderr, "Addr %d, Page %d\n", nwAdd, pg);
     if (!Page_Visit(pg)) {
         if (count < MAX_PHY_PAGE) {
             physic_memory[count] = pg;
