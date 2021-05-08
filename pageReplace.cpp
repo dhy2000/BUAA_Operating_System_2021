@@ -5,7 +5,7 @@
 
 #define MAX_PHY_PAGE 64
 #define PAGE_SHIFT 12
-#define TOTAL_PAGE (1 << 20)
+#define TOTAL_PAGE (1 << 19)
 
 #define get_Page(x) ((x)>>PAGE_SHIFT)
 typedef unsigned int u_int;
