@@ -35,7 +35,7 @@ inline void List_Remove(HNode *hnode) {
     hnode->next->prev = hnode->prev;
     hnode->prev->next = hnode->next;
     hnode->valid = 0;
-    hnode->offset = 0;
+    // hnode->offset = 0;
 }
 
 inline bool Page_Visit(u_int pg) {
@@ -73,3 +73,4 @@ void pageReplace(long * physic_memory, long nwAdd) {
         }
     }
 }
+
