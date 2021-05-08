@@ -201,7 +201,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
     if (srcva >= UTOP || dstva >= UTOP) {
         return -E_INVAL;
     }
-    if (perm & PTE_V) {
+    if (!(perm & PTE_V)) {
         return -E_INVAL;
     }
 
