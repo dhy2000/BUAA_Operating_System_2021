@@ -84,7 +84,7 @@ pgfault(u_int va)
 {
 	u_int *tmp;
 	//	writef("fork.c:pgfault():\t va:%x\n",va);
-/*    u_int perm = ((Pte*)(*vpt))[VPN(va)] & 0xFFF; 
+    u_int perm = ((Pte*)(*vpt))[VPN(va)] & 0xFFF; 
     if (!(perm & PTE_COW)) {
         user_panic("^^^^^^NOT COW^^^^^^^^^");
     }
@@ -102,7 +102,7 @@ pgfault(u_int va)
     //unmap the temporary place
     r = syscall_mem_unmap(0, tmp);
     if (r < 0) {user_panic("^^^^^^PGFAULT FAILED UNMAP^^^^^^^^^");}
-	*/
+	// */
 }
 
 /* Overview:
@@ -128,7 +128,7 @@ duppage(u_int envid, u_int pn)
 	u_int addr;
 	u_int perm;
     int r;
-    /*
+    
     addr = pn * BY2PG;
     perm = ( ((Pte*)(*vpt))[pn] ) & 0xFFF;
     
@@ -143,7 +143,7 @@ duppage(u_int envid, u_int pn)
         if (r < 0) {user_panic("^^^^^^map^^^^^^^^^");}
     }
 
-    */
+    // */
 
 	//	user_panic("duppage not implemented");
 }
