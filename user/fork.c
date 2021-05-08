@@ -84,7 +84,7 @@ pgfault(u_int va)
 {
 	u_int *tmp;
 	//	writef("fork.c:pgfault():\t va:%x\n",va);
-    u_int perm = ((Pte*)(*vpt))[VPN(va)] & 0xFFF; 
+/*    u_int perm = ((Pte*)(*vpt))[VPN(va)] & 0xFFF; 
     if (!(perm & PTE_COW)) {
         user_panic("^^^^^^NOT COW^^^^^^^^^");
     }
@@ -102,7 +102,7 @@ pgfault(u_int va)
     //unmap the temporary place
     r = syscall_mem_unmap(0, tmp);
     if (r < 0) {user_panic("^^^^^^PGFAULT FAILED UNMAP^^^^^^^^^");}
-	
+	*/
 }
 
 /* Overview:
@@ -128,7 +128,7 @@ duppage(u_int envid, u_int pn)
 	u_int addr;
 	u_int perm;
     int r;
-
+    /*
     addr = pn * BY2PG;
     perm = ( ((Pte*)(*vpt))[pn] ) & 0xFFF;
     
@@ -143,7 +143,7 @@ duppage(u_int envid, u_int pn)
         if (r < 0) {user_panic("^^^^^^map^^^^^^^^^");}
     }
 
-
+    */
 
 	//	user_panic("duppage not implemented");
 }
@@ -170,9 +170,9 @@ fork(void)
 
 
 	//The parent installs pgfault using set_pgfault_handler
-    set_pgfault_handler(pgfault);
+    // set_pgfault_handler(pgfault);
 	//alloc a new alloc
-    newenvid = syscall_env_alloc();
+    /*newenvid = syscall_env_alloc();
     if (newenvid < 0) {
         return newenvid; // failure
     }
@@ -198,7 +198,7 @@ fork(void)
         i = syscall_set_env_status(newenvid, ENV_RUNNABLE);
         if (i < 0) {user_panic("^^^^^^error set child's status^^^^^^^^^");}
     }
-
+    */
 
 	return newenvid;
 }
