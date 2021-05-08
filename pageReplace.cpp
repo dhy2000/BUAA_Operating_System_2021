@@ -13,28 +13,31 @@ typedef unsigned int u_int;
 struct HNode {
     bool valid;
     u_int offset;
-    struct HNode *prev, *next;
+    u_int prev, next;
 };
-HNode nodes[TOTAL_PAGE];
-extern HNode ntail;
-HNode nhead = {.valid = false, .offset = 0, .prev = NULL, .next = &ntail};
-HNode ntail = {.valid = false, .offset = 0, .prev = &nhead, .next = NULL};
-#define Lhead (nhead.next)
-#define Ltail (ntail.prev)
+HNode nodes[TOTAL_PAGE + 2];
+u_int nhead = TOTAL_PAGE, ntail = TOTAL_PAGE + 1;
 
 inline void List_Insert_Head(HNode *hnode) {
     // offset is ready
     hnode->valid = 1;
-    hnode->next = Lhead;
-    hnode->prev = &nhead;
-    Lhead->prev = hnode;
-    Lhead = hnode;
+    // hnode->next = Lhead;
+    // hnode->prev = &nhead;
+    // Lhead->prev = hnode;
+    // Lhead = hnode;
+    hnode->next = nodes[nhead].next;
+    hnode->prev = nhead;
+    nodes[nodes[nhead].next].prev = hnode - nodes;
+    nodes[nhead].next = hnode - nodes;
 }
 
 inline void List_Remove(HNode *hnode) {
     assert(hnode->valid);
-    hnode->next->prev = hnode->prev;
-    hnode->prev->next = hnode->next;
+    // hnode->next->prev = hnode->prev;
+    // hnode->prev->next = hnode->next;
+    // hnode->valid = 0;
+    nodes[hnode->next].prev = hnode->prev;
+    nodes[hnode->prev].next = hnode->next;
     hnode->valid = 0;
     // hnode->offset = 0;
 }
@@ -42,7 +45,7 @@ inline void List_Remove(HNode *hnode) {
 inline bool Page_Visit(u_int pg) {
     HNode *hnode = &nodes[pg];
     if (hnode->valid) {
-        if (hnode->prev != &nhead) {
+        if (hnode->prev != nhead) {
             List_Remove(hnode);
             List_Insert_Head(hnode);
         }
@@ -64,8 +67,8 @@ void pageReplace(long * physic_memory, long nwAdd) {
             count++;
         } else {
             // don't need to replace
-            HNode *ndtail = Ltail;
-            assert(ndtail != &nhead);
+            HNode *ndtail = &nodes[nodes[ntail].prev];
+            assert(ndtail != &nodes[nhead]);
             u_int rep_off = ndtail->offset;
             List_Remove(ndtail);
             nodes[pg].offset = rep_off;
