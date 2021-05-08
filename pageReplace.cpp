@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 // #define DEBUG_MESSAGE
+#define NDEBUG
 
 #ifdef DEBUG_MESSAGE
 #include <cstdio>
