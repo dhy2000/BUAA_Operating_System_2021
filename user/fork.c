@@ -131,7 +131,7 @@ duppage(u_int envid, u_int pn)
     
     addr = pn * BY2PG;
     perm = ( ((Pte*)(*vpt))[pn] ) & 0xFFF;
-    
+    writef("^ duppage: pn=%d, perm=%x ^\n", pn, perm);
     if (!(!(perm & PTE_R) || (perm & PTE_LIBRARY) || (perm & PTE_COW))) {
         perm |= PTE_COW;
         r = syscall_mem_map(0, addr, envid, addr, perm);
@@ -182,11 +182,13 @@ fork(void)
 
     } else { // father
         // duppage
+        // writef("^ fork: to duppage - i < %d ^\n", VPN(USTACKTOP));
         /* for (i = 0; i < VPN(USTACKTOP); i++) {
             if ( ( ((Pde*)(*vpd))[(i >> 10)] & PTE_V ) && ( ((Pte*)(*vpt))[(i)] & PTE_V ) ) {
                 duppage(newenvid, i);
             }
         }
+        writef("^ fork: duppage done ^\n");
         // alloc uxstack
         i = syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, PTE_V | PTE_R);
         if (i < 0) {user_panic("^^^^^^err alloc uxstack^^^^^^^^^");}

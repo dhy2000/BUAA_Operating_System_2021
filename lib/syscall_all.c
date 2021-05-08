@@ -199,9 +199,9 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	ret = 0;
 	round_srcva = ROUNDDOWN(srcva, BY2PG);
 	round_dstva = ROUNDDOWN(dstva, BY2PG);
-
+    // printf("# sys_mem_map: srcid=%u, srcva=%u, dstid=%u, dstva=%u, perm=%x\n", srcid, srcva, dstid, dstva, perm);
     //your code here
-    if (round_srcva >= UTOP || round_dstva >= UTOP) {
+    if (srcva >= UTOP || dstva >= UTOP) {
         return -E_INVAL;
     }
     if (!(perm & PTE_V)) {
@@ -222,7 +222,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
     if (!((*ppte) & PTE_V)) {
         return -E_INVAL;
     }
-    // ppage = pa2page(PTE_ADDR(*ppte));
+    ppage = pa2page(PTE_ADDR(*ppte));
     ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm);
     RET_FAIL(ret)
     
