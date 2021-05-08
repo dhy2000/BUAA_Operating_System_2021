@@ -27,6 +27,7 @@ inline void List_Insert_Head(HNode *hnode) {
     hnode->valid = 1;
     hnode->next = Lhead;
     hnode->prev = &nhead;
+    Lhead->prev = hnode;
     Lhead = hnode;
 }
 
