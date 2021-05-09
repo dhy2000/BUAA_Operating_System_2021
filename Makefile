@@ -25,7 +25,7 @@ objects		  := $(boot_dir)/start.o			  \
 				 $(user_dir)/*.x \
 				 $(mm_dir)/*.o
 
-.PHONY: all $(modules) clean startos
+.PHONY: all $(modules) clean startos debug
 
 all: $(modules) vmlinux
 
@@ -44,5 +44,9 @@ clean:
 
 startos:
 	gxemul -E testmips -C R3000 -M 64 gxemul/vmlinux
+
+debug:
+	gxemul -E testmips -C R3000 -M -V 64 gxemul/vmlinux
+
 
 include include.mk
