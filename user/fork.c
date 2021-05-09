@@ -263,8 +263,8 @@ duppage(u_int envid, u_int pn)
  */
 
 
-// #define OS_DEBUG_NIGN_FORK
-// #define OS_DEBUG_NIGN_DUPPAGE
+#define OS_DEBUG_NIGN_FORK
+#define OS_DEBUG_NIGN_DUPPAGE
 
 
 /*** exercise 4.9 4.15***/
