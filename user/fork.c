@@ -295,7 +295,7 @@ fork(void)
         i = syscall_set_pgfault_handler(newenvid, __asm_pgfault_handler, UXSTACKTOP);
         if (i < 0) {user_panic("^^^^^^err set pgfault handler^^^^^^^^^");}
         writef("!! fork.c: pgfault handl done ^\n");
-        */
+        
         i = syscall_set_env_status(newenvid, ENV_RUNNABLE);
         if (i < 0) {user_panic("^^^^^^error set child's status^^^^^^^^^");}
         writef("!! fork.c: fork father done ! ^\n");
