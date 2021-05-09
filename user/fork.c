@@ -197,7 +197,18 @@ duppage(u_int envid, u_int pn)
         writef("^ done dup father's page ^\n");
     }
     writef("^^ duppage done ^^\n");
-// */
+/*    writef("dup dup dup dup dup dup dup dup dup dup\n");
+    int i = 0, j = 0, sz = 7;
+    for (i = -sz + 1; i < sz; i++) {
+        for (j = -sz; j < sz; j++) {
+            int absi = i < 0 ? -i : i;
+            int absj = j < 0 ? -j : j;
+            if (absi + absj == sz - 1) writef("*");
+            else writef(" ");
+        }
+        writef("\n");
+    }
+    // */
 
 
 /*    u_int addr;
@@ -252,8 +263,8 @@ duppage(u_int envid, u_int pn)
  */
 
 
-#define OS_DEBUG_IGN_FORK
-#define OS_DEBUG_IGN_DUPPAGE
+// #define OS_DEBUG_NIGN_FORK
+// #define OS_DEBUG_NIGN_DUPPAGE
 
 
 /*** exercise 4.9 4.15***/
@@ -281,9 +292,9 @@ fork(void)
         env = &envs[ENVX(i)];
 
     } else { // father
-#ifndef OS_DEBUG_IGN_FORK
+#ifdef OS_DEBUG_NIGN_FORK
         writef("!! fork.c: (father) newenvid = %d\n", newenvid);
-#ifndef OS_DEBUG_IGN_DUPPAGE
+#ifdef OS_DEBUG_NIGN_DUPPAGE
         // duppage
         // writef("^ fork: to duppage - i < %d ^\n", VPN(USTACKTOP));
         for (i = 0; i < VPN(USTACKTOP); i++) {

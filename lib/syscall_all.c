@@ -219,9 +219,9 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
     /*if ( (!(*ppte & PTE_R)) && (!!(perm & PTE_R))) {
         return -E_INVAL;
     }*/
-    if (!((*ppte) & PTE_V)) {
+    /*if (!((*ppte) & PTE_V)) {
         return -E_INVAL;
-    }
+    }*/
     // ppage = pa2page(PTE_ADDR(*ppte));
     ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm);
     RET_FAIL(ret)

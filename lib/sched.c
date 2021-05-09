@@ -75,7 +75,7 @@ void sched_yield(void)
         }
         LIST_REMOVE(nenv, env_sched_link);
         count = nenv->env_pri;
-        // printf("$$ env_run next: %d $$\n", nenv->env_id);
+        // printf("$$ sched_yield env_run next: %d $$\n", nenv->env_id);
         env_run(nenv);
 
         /* if (!LIST_EMPTY(&env_sched_list[point])) {
