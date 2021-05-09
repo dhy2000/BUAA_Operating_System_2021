@@ -199,7 +199,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	ret = 0;
 	round_srcva = ROUNDDOWN(srcva, BY2PG);
 	round_dstva = ROUNDDOWN(dstva, BY2PG);
-    // printf("# sys_mem_map: srcid=%u, srcva=%u, dstid=%u, dstva=%u, perm=%x\n", srcid, srcva, dstid, dstva, perm);
+    // printf("# sys_mem_map: srcid=%u, srcva=0x%08x, dstid=%u, dstva=0x%08x, perm=0x%x\n", srcid, srcva, dstid, dstva, perm);
     //your code here
     if (srcva >= UTOP || dstva >= UTOP) {
         return -E_INVAL;
@@ -222,10 +222,10 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
     if (!((*ppte) & PTE_V)) {
         return -E_INVAL;
     }
-    ppage = pa2page(PTE_ADDR(*ppte));
+    // ppage = pa2page(PTE_ADDR(*ppte));
     ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm);
     RET_FAIL(ret)
-    
+    // printf("VV syscall_mem_map OKAY! VV\n");
     ret = 0;
 	return ret;
 }
@@ -304,6 +304,11 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
 	// Your code here.
 	struct Env *env;
 	int ret;
+    if (status != ENV_RUNNABLE && status != ENV_NOT_RUNNABLE && status != ENV_FREE) {
+        return -E_INVAL;
+    }
+
+
     ret = envid2env(envid, &env, 1);
     if (ret < 0) {return ret;}
     env->env_status = status;
