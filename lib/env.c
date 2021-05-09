@@ -85,7 +85,7 @@ int envid2env(u_int envid, struct Env **penv, int checkperm)
 
     if (checkperm) {
         // inverse the condition
-        if (!(e == curenv || e->env_parent_id == envid)) {
+        if (!(e == curenv || e->env_parent_id == curenv->env_id)) {
             *penv = 0;
             return -E_BAD_ENV;
         }
