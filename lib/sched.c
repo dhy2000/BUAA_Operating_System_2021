@@ -30,7 +30,7 @@ void sched_yield(void)
      *  LIST_INSERT_TAIL, LIST_REMOVE, LIST_FIRST, LIST_EMPTY
      */
     struct Env *nenv;
-
+    // printf("$$ sched yield: point = %d $$\n", point);
     count--;
     if (count == 0 || curenv == NULL || curenv->env_status != ENV_RUNNABLE) {
         if (curenv != NULL) {
@@ -47,6 +47,7 @@ void sched_yield(void)
             while (nenv != NULL) {
                 if (nenv->env_status == ENV_RUNNABLE) {
                     hav1 = 1;
+                    // printf("$$ hav1 $$\n");
                     break;
                 }
                 nenv = LIST_NEXT(nenv, env_sched_link);
@@ -62,6 +63,7 @@ void sched_yield(void)
                 while (nenv != NULL) {
                     if (nenv->env_status == ENV_RUNNABLE) {
                         hav2 = 1;
+                        // printf("$$ hav2 $$\n");
                         break;
                     }
                     nenv = LIST_NEXT(nenv, env_sched_link);
@@ -73,6 +75,7 @@ void sched_yield(void)
         }
         LIST_REMOVE(nenv, env_sched_link);
         count = nenv->env_pri;
+        // printf("$$ env_run next: %d $$\n", nenv->env_id);
         env_run(nenv);
 
         /* if (!LIST_EMPTY(&env_sched_list[point])) {
@@ -83,6 +86,7 @@ void sched_yield(void)
         }*/
 
     }
+    // printf("$$ env_run cur $$\n");
     env_run(curenv);
     panic("^^^^^^sched end^^^^^^");
 }
