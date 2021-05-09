@@ -250,6 +250,12 @@ duppage(u_int envid, u_int pn)
  * Note: `set_pgfault_handler`(user/pgfault.c) is different from 
  *       `syscall_set_pgfault_handler`. 
  */
+
+
+#define OS_DEBUG_IGN_FORK
+#define OS_DEBUG_IGN_DUPPAGE
+
+
 /*** exercise 4.9 4.15***/
 extern void __asm_pgfault_handler(void);
 int
@@ -275,16 +281,20 @@ fork(void)
         env = &envs[ENVX(i)];
 
     } else { // father
+#ifndef OS_DEBUG_IGN_FORK
         writef("!! fork.c: (father) newenvid = %d\n", newenvid);
+#ifndef OS_DEBUG_IGN_DUPPAGE
         // duppage
         // writef("^ fork: to duppage - i < %d ^\n", VPN(USTACKTOP));
-        /* for (i = 0; i < VPN(USTACKTOP); i++) {
+        for (i = 0; i < VPN(USTACKTOP); i++) {
             if ( ( ((Pde*)(*vpd))[(i >> 10)] & PTE_V ) && ( ((Pte*)(*vpt))[(i)] & PTE_V ) ) {
                 duppage(newenvid, i);
                 writef("!! fork.c: duppage(%d) ok \n", i);
             }
         }
         writef("!! fork.c: duppage done ^\n");
+        // */
+#endif
         // alloc uxstack
         i = syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, PTE_V | PTE_R);
         if (i < 0) {user_panic("^^^^^^err alloc uxstack^^^^^^^^^");}
@@ -300,6 +310,7 @@ fork(void)
         if (i < 0) {user_panic("^^^^^^error set child's status^^^^^^^^^");}
         writef("!! fork.c: fork father done ! ^\n");
         // */
+#endif
     }
     // */
 
