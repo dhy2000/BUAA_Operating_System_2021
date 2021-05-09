@@ -199,7 +199,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	ret = 0;
 	round_srcva = ROUNDDOWN(srcva, BY2PG);
 	round_dstva = ROUNDDOWN(dstva, BY2PG);
-    // printf("# sys_mem_map: srcid=%u, srcva=0x%08x, dstid=%u, dstva=0x%08x, perm=0x%x\n", srcid, srcva, dstid, dstva, perm);
+    printf("# sys_mem_map: srcid=%u, srcva=0x%08x, dstid=%u, dstva=0x%08x, perm=0x%x\n", srcid, srcva, dstid, dstva, perm);
     //your code here
     if (srcva >= UTOP || dstva >= UTOP) {
         return -E_INVAL;
@@ -225,7 +225,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
     // ppage = pa2page(PTE_ADDR(*ppte));
     ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm);
     RET_FAIL(ret)
-    // printf("VV syscall_mem_map OKAY! VV\n");
+    printf("# ** syscall_mem_map done! **\n");
     ret = 0;
 	return ret;
 }
@@ -307,12 +307,13 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
     if (status != ENV_RUNNABLE && status != ENV_NOT_RUNNABLE && status != ENV_FREE) {
         return -E_INVAL;
     }
-
+    // printf("## set_env_status: set %d to %d\n", envid, status);
 
     ret = envid2env(envid, &env, 1);
     if (ret < 0) {return ret;}
     env->env_status = status;
     if (status == ENV_RUNNABLE) {
+        // printf("## set env(%d) RUNNABLE\n", env->env_id);
         LIST_INSERT_HEAD(&env_sched_list[0], env, env_sched_link);
     } else if (status == ENV_FREE) {
         env_destroy(env);
