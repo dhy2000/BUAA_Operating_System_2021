@@ -83,7 +83,7 @@ static void
 pgfault(u_int va)
 {
 	u_int *tmp;
-	writef("^ fork.c:pgfault():\t va:%x\n",va);
+	// writef("^ fork.c:pgfault():\t va:%x\n",va);
     u_int perm = ((Pte*)(*vpt))[VPN(va)] & 0xFFF; 
     if (!(perm & PTE_COW)) {
         user_panic("^^^^^^NOT COW^^^^^^^^^");
@@ -102,7 +102,8 @@ pgfault(u_int va)
     //unmap the temporary place
     r = syscall_mem_unmap(0, tmp);
     if (r < 0) {user_panic("^^^^^^PGFAULT FAILED UNMAP^^^^^^^^^");}
-	// */
+	// writef("^ fork.c: pgfault(va=%x) done ^\n", va);
+    // */
 }
 
 /* Overview:
@@ -125,20 +126,20 @@ pgfault(u_int va)
 static void
 duppage(u_int envid, u_int pn)
 {
-	/*u_int addr;
+	u_int addr;
 	u_int perm;
     int r;
     
     addr = pn * BY2PG;
     perm = ( ((Pte*)(*vpt))[pn] ) & 0xFFF;
-    writef("^ duppage: pn=%d, perm=%x ^\n", pn, perm);
+    // writef("^ duppage: pn=%d, perm=%x ^\n", pn, perm);
     if (!(!(perm & PTE_R) || (perm & PTE_LIBRARY) || (perm & PTE_COW))) {
         perm |= PTE_COW;
         r = syscall_mem_map(0, addr, envid, addr, perm);
         if (r < 0) {user_panic("^^^^^^map(child)^^^^^^^^^");}
         r = syscall_mem_map(0, addr, 0, addr, perm);
         if (r < 0) {user_panic("^^^^^^map(father)^^^^^^^^^");}
-        writef("^^ duppage done ^^\n");
+        // writef("^^ duppage done ^^\n");
     } else {
         syscall_mem_map(0, addr, envid, addr, perm);
         if (r < 0) {user_panic("^^^^^^map^^^^^^^^^");}
@@ -146,13 +147,13 @@ duppage(u_int envid, u_int pn)
 
     // */
 
-    u_int addr;
+    /*u_int addr;
     u_int perm;
     addr = pn << PGSHIFT;
     perm = ((Pte *)(*vpt))[pn] & 0xfff;
+*/
 
-
-    writef("^ duppage: pn=%d, perm=%x ^\n", pn, perm);
+    // writef("^ duppage: pn=%d, perm=%x ^\n", pn, perm);
     
 
 
@@ -162,7 +163,7 @@ duppage(u_int envid, u_int pn)
     //writef("%x %x\n",addr, ((Pte *)(*vpt))[pn]);
     
     
-    if ((perm & PTE_R) == 0)
+    /* if ((perm & PTE_R) == 0)
     {
         if(syscall_mem_map(0, addr, envid, addr, perm) < 0)
         {
@@ -196,7 +197,10 @@ duppage(u_int envid, u_int pn)
         }
         writef("^ done dup father's page ^\n");
     }
-    writef("^^ duppage done ^^\n");
+
+    // */
+
+    // writef("^^ duppage done ^^\n");
 /*    writef("dup dup dup dup dup dup dup dup dup dup\n");
     int i = 0, j = 0, sz = 7;
     for (i = -sz + 1; i < sz; i++) {
@@ -286,40 +290,40 @@ fork(void)
     if (newenvid < 0) {
         return newenvid; // failure
     }
-    writef("!! fork.c: after syscall_env_alloc()\n");
+    // writef("!! fork.c: after syscall_env_alloc()\n");
     if (newenvid == 0) { // child
         i = syscall_getenvid();
         env = &envs[ENVX(i)];
 
     } else { // father
 #ifdef OS_DEBUG_NIGN_FORK
-        writef("!! fork.c: (father) newenvid = %d\n", newenvid);
+        // writef("!! fork.c: (father) newenvid = %d\n", newenvid);
 #ifdef OS_DEBUG_NIGN_DUPPAGE
         // duppage
         // writef("^ fork: to duppage - i < %d ^\n", VPN(USTACKTOP));
         for (i = 0; i < VPN(USTACKTOP); i++) {
             if ( ( ((Pde*)(*vpd))[(i >> 10)] & PTE_V ) && ( ((Pte*)(*vpt))[(i)] & PTE_V ) ) {
                 duppage(newenvid, i);
-                writef("!! fork.c: duppage(%d) ok \n", i);
+                // writef("!! fork.c: duppage(%d) ok \n", i);
             }
         }
-        writef("!! fork.c: duppage done ^\n");
+        // writef("!! fork.c: duppage done ^\n");
         // */
 #endif
         // alloc uxstack
         i = syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, PTE_V | PTE_R);
         if (i < 0) {user_panic("^^^^^^err alloc uxstack^^^^^^^^^");}
-        writef("!! fork.c: uxstack done ^\n");
+        // writef("!! fork.c: uxstack done ^\n");
         
         
         // set_pgfault_handler
         i = syscall_set_pgfault_handler(newenvid, __asm_pgfault_handler, UXSTACKTOP);
         if (i < 0) {user_panic("^^^^^^err set pgfault handler^^^^^^^^^");}
-        writef("!! fork.c: pgfault handl done ^\n");
+        // writef("!! fork.c: pgfault handl done ^\n");
         
         i = syscall_set_env_status(newenvid, ENV_RUNNABLE);
         if (i < 0) {user_panic("^^^^^^error set child's status^^^^^^^^^");}
-        writef("!! fork.c: fork father done ! ^\n");
+        // writef("!! fork.c: fork father done ! ^\n");
         // */
 #endif
     }
