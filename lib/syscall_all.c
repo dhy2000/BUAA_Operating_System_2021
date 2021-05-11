@@ -401,7 +401,7 @@ void sys_ipc_recv(int sysno, u_int dstva)
  * Hint: the only function you need to call is envid2env.
  */
 /*** exercise 4.7 ***/
-int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
+int sys_ipc_can_send(int sysno, u_int envid, u_int transfer_id, u_int value, u_int srcva,
 					 u_int perm)
 {
 
@@ -412,8 +412,16 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
     if (srcva >= UTOP) {
         return -E_INVAL;
     }
-    r = envid2env(envid, &e, 0);
-    RET_FAIL(r);
+    
+    if (transfer_id == -1) {
+        r = envid2env(envid, &e, 0);
+        RET_FAIL(r);
+    } else {
+        r = envid2env(transfer_id, &e, 0);
+        RET_FAIL(r);
+        e->env_ipc_destination_id = envid;
+    }
+
     if (e->env_ipc_recving == 0) {
         return -E_IPC_NOT_RECV;
     }
