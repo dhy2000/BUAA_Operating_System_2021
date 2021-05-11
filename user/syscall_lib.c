@@ -13,6 +13,7 @@ void syscall_putchar(char ch)
 u_int
 syscall_getenvid(void)
 {
+    //writef("!! user: syscall_getenv_id\n");
 	return msyscall(SYS_getenvid, 5, 0, 0, 0, 0, 0);
 }
 
@@ -31,18 +32,22 @@ syscall_env_destroy(u_int envid)
 int
 syscall_set_pgfault_handler(u_int envid, void (*func)(void), u_int xstacktop)
 {
+
+    //writef("!! u_syscall_set_pgfault_handler: %d 0x%x 0x%x\n", envid, (int)func, xstacktop);
 	return msyscall(SYS_set_pgfault_handler, 5, envid, (int)func, xstacktop, 0, 0);
 }
 
 int
 syscall_mem_alloc(u_int envid, u_int va, u_int perm)
 {
+    //writef("!! u_syscall_mem_alloc: %d 0x%x 0x%x\n", envid, va, perm);
 	return msyscall(SYS_mem_alloc, 5, envid, va, perm, 0, 0);
 }
 
 int
 syscall_mem_map(u_int srcid, u_int srcva, u_int dstid, u_int dstva, u_int perm)
 {
+    //writef("!! u_syscall_mem_map: %d 0x%x %d 0x%x 0x%x\n", srcid, srcva, dstid, dstva, perm);
 	return msyscall(SYS_mem_map, 5, srcid, srcva, dstid, dstva, perm);
 }
 

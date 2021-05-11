@@ -4,6 +4,13 @@
 #include <stackframe.h>
 #include <unistd.h>
 
+.macro LIVE_PRINT chr
+    addiu   a0, zero, \chr
+    jal printcharc
+    nop
+.endm
+
+
 /*** exercise 4.2 ***/
 NESTED(handle_sys,TF_SIZE, sp)
     SAVE_ALL                            // Macro used to save trapframe
@@ -27,18 +34,24 @@ PART1_STORE_BACK:
 
     // TODO: Copy the syscall number into $a0.
     lw      a0, TF_REG4(sp)
+    addu   s6, zero, a0
 
     addiu   a0, a0, -__SYSCALL_BASE     // a0 <- relative syscall number
     sll     t0, a0, 2                   // t0 <- relative syscall number times 4
     la      t1, sys_call_table          // t1 <- syscall table base
     addu    t1, t1, t0                  // t1 <- table entry of specific syscall
-    lw      t2, 0(t1)                   // t2 <- function entry of specific syscall
+    lw      t7, 0(t1)                   // t2 <- function entry of specific syscall
 
     lw      t0, TF_REG29(sp)            // t0 <- user's stack pointer
     // lw      t3, 16(t0)                  // t3 <- the 5th argument of msyscall
     // lw      t4, 20(t0)                  // t4 <- the 6th argument of msyscall
     
     // TODO: Allocate a space of **a1** arguments on current kernel stack and copy the **a1** arguments to proper location
+    
+    
+    
+    
+    
     lw      a0, TF_REG4(sp)
     lw      t1, TF_REG5(sp)
     // lw      a2, TF_REG6(sp)
@@ -55,7 +68,12 @@ PART1_STORE_BACK:
     // first: store the offset of kernel sp
     addiu t1, t1, 1
     sll s1, t1, 2
-    subu sp, sp, s1
+    subu sp, sp, s1 /*  ---------- sp changed here ---------- */
+    addiu t5, t1, 65
+    // addu a0, zero, t5 
+    // jal printcharc
+    // nop
+
     // if (t1 >= 3): copy usp[0] to a3
     addiu t2, zero, 3
     blt t1, t2, CALL_SYS_FUNC
@@ -65,23 +83,28 @@ PART1_STORE_BACK:
     addiu t2, t2, 1 // t2 = 4
     blt t1, t2, CALL_SYS_FUNC
     nop
+    
+    
     // begin loop on copy
     addiu t1, t1, -4 // number of argument in stack
     addiu t2, t0, 20
     addiu t3, sp, 16
 COPY_LOOP:
     // if (t1 == 0) break
-    bgez t1, CALL_SYS_FUNC
+    bltz t1, CALL_SYS_FUNC
     nop
     lw t4, 0(t2)
     sw t4, 0(t3)
     addiu t2, t2, 4
+
     addiu t3, t3, 4
+    addiu t1, t1, -1
     j COPY_LOOP
     nop
-    
+
 CALL_SYS_FUNC:
-    jalr    t2                          // Invoke sys_* function
+    addu a0, zero, s6
+    jalr    t7                          // Invoke sys_* function
     nop
     
     // TODO: Resume current kernel stack

@@ -56,7 +56,8 @@ void *memcpy(void *destaddr, void const *srcaddr, u_int len)
  */
 u_int sys_getenvid(void)
 {
-	return curenv->env_id;
+    // printf(">> sys_getenvid\n");
+    return curenv->env_id;
 }
 
 /* Overview:
@@ -115,6 +116,7 @@ int sys_env_destroy(int sysno, u_int envid)
 /*** exercise 4.12 ***/
 int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)
 {
+    // printf("!! k_sys_set_pgfault_handler: %d 0x%x 0x%x\n", envid, (int)func, xstacktop);
 	// Your code here.
 	struct Env *env;
 	int ret;
@@ -147,6 +149,8 @@ int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)
 /*** exercise 4.3 ***/
 int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 {
+
+    // printf("!! k_sys_mem_alloc: %d 0x%x 0x%x\n", envid, va, perm);
 	// Your code here.
 	struct Env *env;
 	struct Page *ppage;
@@ -188,6 +192,8 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 				u_int perm)
 {
+
+    // printf("!! k_sys_mem_map: %d 0x%x %d 0x%x 0x%x\n", srcid, srcva, dstid, dstva, perm);
 	int ret;
 	u_int round_srcva, round_dstva;
 	struct Env *srcenv;
@@ -271,6 +277,8 @@ int sys_mem_unmap(int sysno, u_int envid, u_int va)
 /*** exercise 4.8 ***/
 int sys_env_alloc(void)
 {
+
+    // printf(">> k_sys_env_alloc:\n");
 	// Your code here.
 	int r;
 	struct Env *e;
