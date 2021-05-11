@@ -436,3 +436,9 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	return 0;
 }
 
+
+int sys_ipc_can_multi_send(int sysno, u_int value, u_int srcva, u_int perm,
+        u_int envid_1, u_int envid_2, u_int envid_3, u_int envid_4, u_int envid_5) {
+
+    return -E_INVAL;
+}
