@@ -62,7 +62,7 @@ inline static int syscall_env_alloc(void)
 int syscall_set_env_status(u_int envid, u_int status);
 int syscall_set_trapframe(u_int envid, struct Trapframe *tf);
 void syscall_panic(char *msg);
-int syscall_ipc_can_send(u_int envid, u_int value, u_int transfer_id, u_int srcva, u_int perm);
+int syscall_ipc_can_send(u_int envid, u_int value, int transfer_id, u_int srcva, u_int perm);
 void syscall_ipc_recv(u_int dstva);
 int syscall_cgetc();
 
@@ -74,7 +74,7 @@ void *memcpy(void *destaddr, void const *srcaddr, u_int len);
 int strcmp(const char *p, const char *q);
 
 // ipc.c
-void	ipc_send(u_int whom, u_int val, u_int transfer_id, u_int srcva, u_int perm);
+void	ipc_send(u_int whom, u_int val, int transfer_id, u_int srcva, u_int perm);
 u_int	ipc_recv(u_int *whom, u_int dstva, u_int *perm);
 
 // wait.c

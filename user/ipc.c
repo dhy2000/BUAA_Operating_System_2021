@@ -12,7 +12,7 @@ extern struct Env *env;
 //
 // Hint: use syscall_yield() to be CPU-friendly.
 void
-ipc_send(u_int whom, u_int val, u_int transfer_id, u_int srcva, u_int perm)
+ipc_send(u_int whom, u_int val, int transfer_id, u_int srcva, u_int perm)
 {
 	int r;
     if (1) { 
