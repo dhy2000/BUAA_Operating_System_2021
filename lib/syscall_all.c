@@ -447,6 +447,44 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 
 int sys_ipc_can_multi_send(int sysno, u_int value, u_int srcva, u_int perm,
         u_int envid_1, u_int envid_2, u_int envid_3, u_int envid_4, u_int envid_5) {
+    int r, i;
+    u_int envid[5];
+    struct Env *e[5];
+    struct Page *p;
+    
+    envid[0] = envid_1;
+    envid[1] = envid_2;
+    envid[2] = envid_3;
+    envid[3] = envid_4;
+    envid[4] = envid_5;
 
-    return -E_INVAL;
+    if (srcva >= UTOP) {
+        return -E_INVAL;
+    }
+    for (i = 0; i < 5; i++) {
+        r = envid2env(envid[i], &e[i], 0);
+        RET_FAIL(r);
+        if (e[i]->env_ipc_recving == 0) {
+            return -E_IPC_NOT_RECV;
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        e[i]->env_ipc_value = value;
+        e[i]->env_ipc_from = curenv->env_id;
+        e[i]->env_ipc_perm = perm;
+        e[i]->env_ipc_recving = 0;
+        e[i]->env_status = ENV_RUNNABLE;
+        
+        if (srcva != 0) {
+            Pte *pte;
+            p = page_lookup(curenv->env_pgdir, srcva, &pte);
+            if (p == NULL) {
+                return -E_INVAL;
+            }
+            page_insert(e[i]->env_pgdir, p, e[i]->env_ipc_dstva, perm);
+        }
+    }
+
+
+    return 0;
 }
