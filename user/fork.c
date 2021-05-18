@@ -293,11 +293,17 @@ int tfork(void) {
         // duppage
         // writef("^ fork: to duppage - i < %d ^\n", VPN(USTACKTOP));
         
-        for (i = 0; i < VPN(USTACKTOP); i++) {
+        // get user_sp
+        u_int usp = uget_sp();
+
+        for (i = 0; i < VPN(usp); i++) {
             if ( ( ((Pde*)(*vpd))[(i >> 10)] & PTE_V ) && ( ((Pte*)(*vpt))[(i)] & PTE_V ) ) {
                 tduppage(newenvid, i);
                 // writef("!! fork.c: duppage(%d) ok \n", i);
             }
+        }
+        for (; i < VPN(USTACKTOP); i++) {
+            duppage(newenvid, i);
         }
         // writef("!! fork.c: duppage done ^\n");
         // */
@@ -326,7 +332,8 @@ int tfork(void) {
 
 
 u_int uget_sp(void) {
-    return mgetsp();
+    u_int sp = mgetsp();
+    return ROUNDDOWN(sp, BY2PG);
 }
 
 
