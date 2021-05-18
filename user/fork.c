@@ -250,7 +250,7 @@ tduppage(u_int envid, u_int pn)
         syscall_mem_map(0, addr, envid, addr, perm);
         if (r < 0) {user_panic("^^^^^^map^^^^^^^^^");}
     }*/
-    if (perm & PTE_COW) {
+    if ((perm & PTE_R) && !(perm & PTE_LIBRARY) && (perm & PTE_COW)) {
         pgfault(addr);
         perm = ( ((Pte*)(*vpt))[pn] ) & 0xFFF;
     }
@@ -296,6 +296,7 @@ int tfork(void) {
         // get user_sp
         u_int usp = uget_sp();
 
+        // writef("tfork: uget_sp = %x, VPN(USTACKTOP)=%x, VPN(user_sp)=%x\n", usp, VPN(USTACKTOP), VPN(usp));
         for (i = 0; i < VPN(usp); i++) {
             if ( ( ((Pde*)(*vpd))[(i >> 10)] & PTE_V ) && ( ((Pte*)(*vpt))[(i)] & PTE_V ) ) {
                 tduppage(newenvid, i);
@@ -333,6 +334,7 @@ int tfork(void) {
 
 u_int uget_sp(void) {
     u_int sp = mgetsp();
+    writef("# uget_sp: sp=%x\n", sp);
     return ROUNDDOWN(sp, BY2PG);
 }
 
