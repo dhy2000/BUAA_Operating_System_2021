@@ -332,6 +332,70 @@ fork(void)
 	return newenvid;
 }
 
+// ^^^^^^ON EXAM^^^^^^^^^
+int tfork(void) {
+
+	u_int newenvid;
+	extern struct Env *envs;
+	extern struct Env *env;
+	u_int i;
+
+
+	//The parent installs pgfault using set_pgfault_handler
+    set_pgfault_handler(pgfault);
+	//alloc a new alloc
+    newenvid = syscall_env_alloc();
+    if (newenvid < 0) {
+        return newenvid; // failure
+    }
+    
+    if (newenvid == 0) { // child
+        i = syscall_getenvid();
+        env = &envs[ENVX(i)];
+
+    } else { // father
+        
+        // writef("!! fork.c: (father) newenvid = %d\n", newenvid);
+        // duppage
+        // writef("^ fork: to duppage - i < %d ^\n", VPN(USTACKTOP));
+        
+        for (i = 0; i < VPN(USTACKTOP); i++) {
+            if ( ( ((Pde*)(*vpd))[(i >> 10)] & PTE_V ) && ( ((Pte*)(*vpt))[(i)] & PTE_V ) ) {
+                duppage(newenvid, i);
+                // writef("!! fork.c: duppage(%d) ok \n", i);
+            }
+        }
+        // writef("!! fork.c: duppage done ^\n");
+        // */
+        
+        // alloc uxstack
+        i = syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, PTE_V | PTE_R);
+        if (i < 0) {user_panic("^^^^^^err alloc uxstack^^^^^^^^^");}
+        // writef("!! fork.c: uxstack done ^\n");
+        
+        
+        // set_pgfault_handler
+        i = syscall_set_pgfault_handler(newenvid, __asm_pgfault_handler, UXSTACKTOP);
+        if (i < 0) {user_panic("^^^^^^err set pgfault handler^^^^^^^^^");}
+        // writef("!! fork.c: pgfault handl done ^\n");
+        
+        
+        i = syscall_set_env_status(newenvid, ENV_RUNNABLE);
+        if (i < 0) {user_panic("^^^^^^error set child's status^^^^^^^^^");}
+        // writef("!! fork.c: fork father done ! ^\n");
+        // */
+    }
+    // */
+
+	return newenvid;
+}
+
+
+u_int uget_sp(void) {
+    return mgetsp();
+}
+
+
 // Challenge!
 int
 sfork(void)

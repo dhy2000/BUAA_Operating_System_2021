@@ -12,3 +12,12 @@ LEAF(msyscall)
 
 END(msyscall)
 
+/*** lab4-2-exam ***/
+
+LEAF(mgetsp)
+    addu v0, zero, sp
+
+    jr ra
+    nop
+
+END(mgetsp)
