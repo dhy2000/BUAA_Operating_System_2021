@@ -83,7 +83,7 @@ static void
 pgfault(u_int va)
 {
 	u_int *tmp;
-	// writef("^ fork.c:pgfault():\t va:%x\n",va);
+	writef("\n^ fork.c: user state pgfault():\t va:%x\n",va);
     u_int perm = ((Pte*)(*vpt))[VPN(va)] & 0xFFF; 
     if (!(perm & PTE_COW)) {
         user_panic("^^^^^^NOT COW^^^^^^^^^");
@@ -147,112 +147,6 @@ duppage(u_int envid, u_int pn)
 
     // */
 
-    /*u_int addr;
-    u_int perm;
-    addr = pn << PGSHIFT;
-    perm = ((Pte *)(*vpt))[pn] & 0xfff;
-*/
-
-    // writef("^ duppage: pn=%d, perm=%x ^\n", pn, perm);
-    
-
-
-    /*writef("^ fake duppage: return 0 ^\n");
-    return 0;
-    // */
-    //writef("%x %x\n",addr, ((Pte *)(*vpt))[pn]);
-    
-    
-    /* if ((perm & PTE_R) == 0)
-    {
-        if(syscall_mem_map(0, addr, envid, addr, perm) < 0)
-        {
-            user_panic("user panic mem map error!1");
-        }
-    }
-    else if (perm & PTE_LIBRARY)
-    {
-        if(syscall_mem_map(0, addr, envid, addr, perm) < 0)
-        {
-            user_panic("user panic mem map error!2");
-        }
-    }
-    else if (perm & PTE_COW)
-    {
-        if(syscall_mem_map(0, addr, envid, addr, perm) < 0)
-        {
-            user_panic("user panic mem map error!3");
-        }
-    }
-    else
-    {   
-        if(syscall_mem_map(0, addr, envid, addr, perm | PTE_COW) < 0)
-        {
-            user_panic("user panic mem map error!4");
-        }
-        writef("^ done dup child's page ^\n");
-        if(syscall_mem_map(0, addr, 0, addr, perm | PTE_COW) < 0)
-        {
-            user_panic("user panic mem map error!5");
-        }
-        writef("^ done dup father's page ^\n");
-    }
-
-    // */
-
-    // writef("^^ duppage done ^^\n");
-/*    writef("dup dup dup dup dup dup dup dup dup dup\n");
-    int i = 0, j = 0, sz = 7;
-    for (i = -sz + 1; i < sz; i++) {
-        for (j = -sz; j < sz; j++) {
-            int absi = i < 0 ? -i : i;
-            int absj = j < 0 ? -j : j;
-            if (absi + absj == sz - 1) writef("*");
-            else writef(" ");
-        }
-        writef("\n");
-    }
-    // */
-
-
-/*    u_int addr;
-    u_int perm;
-
-    int flag = 0;
-
-    // writef("4.10 used\n");
-    addr = pn << PGSHIFT;
-    perm = (*vpt)[pn] & 0xfff;
-
-    if (((perm & PTE_R) != 0) && (perm & PTE_V)) {
-        if (perm & PTE_LIBRARY) {
-            // static sharing
-            perm = PTE_V | PTE_R | PTE_LIBRARY | perm;
-        } else {
-            // need paste one
-            perm = PTE_V | PTE_R | PTE_COW | perm;
-        }
-        // child map
-        if (syscall_mem_map(syscall_getenvid(), addr, envid, addr, perm) < 0) {
-            writef("%x\n", addr);
-            user_panic("sys_mem_map for son failed.\n");
-        }
-        // fa map
-        if (syscall_mem_map(syscall_getenvid(), addr, syscall_getenvid(), addr,
-                            perm) < 0) {
-            user_panic("sys_mem_map for father failed.\n");
-        }
-    } else {
-        // read-only or invalid
-        if (syscall_mem_map(syscall_getenvid(), addr, envid, addr, perm) < 0) {
-            user_panic("sys_mem_map for son failed.1\n");
-        }
-    }
-
-
-    writef("^^ duppage done ^^\n");
-*/
-
 	//	user_panic("duppage not implemented");
 }
 
@@ -300,30 +194,30 @@ fork(void)
         // writef("!! fork.c: (father) newenvid = %d\n", newenvid);
 #ifdef OS_DEBUG_NIGN_DUPPAGE
         // duppage
-        // writef("^ fork: to duppage - i < %d ^\n", VPN(USTACKTOP));
+        writef("!! fork.c: to duppage - i < %d ^\n", VPN(USTACKTOP));
         for (i = 0; i < VPN(USTACKTOP); i++) {
             if ( ( ((Pde*)(*vpd))[(i >> 10)] & PTE_V ) && ( ((Pte*)(*vpt))[(i)] & PTE_V ) ) {
                 duppage(newenvid, i);
-                // writef("!! fork.c: duppage(%d) ok \n", i);
+                writef("!! fork.c: duppage(%d) ok \n", i);
             }
         }
-        // writef("!! fork.c: duppage done ^\n");
+        writef("!! fork.c: duppage done ^\n");
         // */
 #endif
         // alloc uxstack
         i = syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, PTE_V | PTE_R);
         if (i < 0) {user_panic("^^^^^^err alloc uxstack^^^^^^^^^");}
-        // writef("!! fork.c: uxstack done ^\n");
+        writef("!! fork.c: uxstack done ^\n");
         
         
         // set_pgfault_handler
         i = syscall_set_pgfault_handler(newenvid, __asm_pgfault_handler, UXSTACKTOP);
         if (i < 0) {user_panic("^^^^^^err set pgfault handler^^^^^^^^^");}
-        // writef("!! fork.c: pgfault handl done ^\n");
+        writef("!! fork.c: pgfault handl done ^\n");
         
         i = syscall_set_env_status(newenvid, ENV_RUNNABLE);
         if (i < 0) {user_panic("^^^^^^error set child's status^^^^^^^^^");}
-        // writef("!! fork.c: fork father done ! ^\n");
+        writef("!! fork.c: fork father done ! ^\n");
         // */
 #endif
     }

@@ -40,8 +40,8 @@ struct Env {
 	u_int env_xstacktop;            // top of exception stack
 
 	// Lab 6 scheduler counts
-	u_int env_runs;			// number of times been env_run'ed
-	u_int env_nop;                  // align to avoid mul instruction
+	u_int env_pgcow;
+	u_int env_pgout;
 };
 
 LIST_HEAD(Env_list, Env);
