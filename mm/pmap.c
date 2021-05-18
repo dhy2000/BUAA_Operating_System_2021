@@ -677,7 +677,7 @@ void pageout(int va, int context)
 
     if (curenv != NULL) {
         curenv->env_pgout++;
-        printf("\nEnv:0x%x, va:0x%x, pgcow:%d, pgout:%d\n", curenv->env_id, va, curenv->env_pgcow, curenv->env_pgout);
+        //printf("\nEnv:0x%x, va:0x%x, pgcow:%d, pgout:%d\n", curenv->env_id, va, curenv->env_pgcow, curenv->env_pgout);
     }
     p->pp_ref++;
 
