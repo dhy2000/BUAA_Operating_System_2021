@@ -83,7 +83,7 @@ static void
 pgfault(u_int va)
 {
 	u_int *tmp;
-	writef("\n^ fork.c: user state pgfault():\t va:%x\n",va);
+	// writef("\n^ fork.c: user state pgfault():\t va:%x\n",va);
     u_int perm = ((Pte*)(*vpt))[VPN(va)] & 0xFFF; 
     if (!(perm & PTE_COW)) {
         user_panic("^^^^^^NOT COW^^^^^^^^^");
@@ -194,30 +194,30 @@ fork(void)
         // writef("!! fork.c: (father) newenvid = %d\n", newenvid);
 #ifdef OS_DEBUG_NIGN_DUPPAGE
         // duppage
-        writef("!! fork.c: to duppage - i < %d ^\n", VPN(USTACKTOP));
+        // writef("!! fork.c: to duppage - i < %d ^\n", VPN(USTACKTOP));
         for (i = 0; i < VPN(USTACKTOP); i++) {
             if ( ( ((Pde*)(*vpd))[(i >> 10)] & PTE_V ) && ( ((Pte*)(*vpt))[(i)] & PTE_V ) ) {
                 duppage(newenvid, i);
-                writef("!! fork.c: duppage(%d) ok \n", i);
+                // writef("!! fork.c: duppage(%d) ok \n", i);
             }
         }
-        writef("!! fork.c: duppage done ^\n");
+        // writef("!! fork.c: duppage done ^\n");
         // */
 #endif
         // alloc uxstack
         i = syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, PTE_V | PTE_R);
         if (i < 0) {user_panic("^^^^^^err alloc uxstack^^^^^^^^^");}
-        writef("!! fork.c: uxstack done ^\n");
+        // writef("!! fork.c: uxstack done ^\n");
         
         
         // set_pgfault_handler
         i = syscall_set_pgfault_handler(newenvid, __asm_pgfault_handler, UXSTACKTOP);
         if (i < 0) {user_panic("^^^^^^err set pgfault handler^^^^^^^^^");}
-        writef("!! fork.c: pgfault handl done ^\n");
+        // writef("!! fork.c: pgfault handl done ^\n");
         
         i = syscall_set_env_status(newenvid, ENV_RUNNABLE);
         if (i < 0) {user_panic("^^^^^^error set child's status^^^^^^^^^");}
-        writef("!! fork.c: fork father done ! ^\n");
+        // writef("!! fork.c: fork father done ! ^\n");
         // */
 #endif
     }

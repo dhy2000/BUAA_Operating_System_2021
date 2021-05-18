@@ -52,7 +52,14 @@ page_fault_handler(struct Trapframe *tf)
 {
     struct Trapframe PgTrapFrame;
     extern struct Env *curenv;
-
+    
+    // printf("^^^ system__asm_pagefault_handler ^^^\n");
+    if (curenv != NULL) {
+        curenv->env_pgcow++;
+        u_int code = *(u_int*)(curenv->env_tf.cp0_epc);
+        printf("\nEnv:0x%x, code:0x%x, pgcow:%d, pgout:%d\n", curenv->env_id, code, curenv->env_pgcow, curenv->env_pgout);
+    }
+    
     bcopy(tf, &PgTrapFrame, sizeof(struct Trapframe));
 
     if (tf->regs[29] >= (curenv->env_xstacktop - BY2PG) &&
