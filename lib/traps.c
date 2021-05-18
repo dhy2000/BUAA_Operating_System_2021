@@ -56,7 +56,8 @@ page_fault_handler(struct Trapframe *tf)
     // printf("^^^ system__asm_pagefault_handler ^^^\n");
     if (curenv != NULL) {
         curenv->env_pgcow++;
-        u_int code = *(u_int*)(tf->cp0_epc);
+        // u_int code = *(u_int*)(tf->cp0_epc);
+        u_int code = 0;
         printf("\nEnv:0x%x, code:0x%x, pgcow:%d, pgout:%d\n", curenv->env_id, code, curenv->env_pgcow, curenv->env_pgout);
     }
     
