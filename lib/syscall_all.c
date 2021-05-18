@@ -409,6 +409,7 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	struct Env *e;
 	struct Page *p;
     
+    // printf("^^ (%d) call sys_ipc_can_send ^^\n", envid);    
     if (srcva >= UTOP) {
         return -E_INVAL;
     }
@@ -417,7 +418,6 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
     if (e->env_ipc_recving == 0) {
         return -E_IPC_NOT_RECV;
     }
-    
     e->env_ipc_value = value;
     e->env_ipc_from = curenv->env_id;
     e->env_ipc_perm = perm;

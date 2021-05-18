@@ -20,7 +20,7 @@ ipc_send(u_int whom, u_int val, u_int srcva, u_int perm)
 		syscall_yield();
 		//writef("QQ");
 	}
-
+    writef("## ipc_send done, whom=%d \n", whom);
 	if (r == 0) {
 		return;
 	}
