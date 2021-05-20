@@ -436,6 +436,10 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	return 0;
 }
 
+#define KSEG1_ADDR (0xa0000000)
+#define NUM_DEVICES 3
+static u_int dev_start_addr[3] = {0x10000000, 0x13000000, 0x15000000};
+static u_int dev_length[3] = {0x20, 0x4200, 0x200};
 /* Overview:
  * 	This function is used to write data to device, which is
  * 	represented by its mapped physical address.
@@ -463,7 +467,21 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
  */
 int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
 {
-        // Your code here
+    // Your code here
+    if (va >= ULIM) {
+        return -E_INVAL;
+    }
+    int i;
+    for (i = 0; i < NUM_DEVICES; i++) {
+        if (dev_start_addr[i] <= dev && dev + len <= dev_start_addr[i] + dev_length[i]) {
+            break;
+        }
+    }
+    if (i >= NUM_DEVICES) {
+        return -E_INVAL;
+    }
+
+    bcopy((void*)va, (void*)(dev + KSEG1_ADDR), len);
 }
 
 /* Overview:
@@ -485,4 +503,18 @@ int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
 int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
 {
         // Your code here
+    if (va >= ULIM) {
+        return -E_INVAL;
+    }
+    int i;
+    for (i = 0; i < NUM_DEVICES; i++) {
+        if (dev_start_addr[i] <= dev && dev + len <= dev_start_addr[i] + dev_length[i]) {
+            break;
+        }
+    }
+    if (i >= NUM_DEVICES) {
+        return -E_INVAL;
+    }
+
+    bcopy((void*)(dev + KSEG1_ADDR), (void*)va, len);
 }
