@@ -259,7 +259,7 @@ serve(void)
 
 		req = ipc_recv(&whom, REQVA, &perm);
 
-        writef("serv.c: recv req[%d] from %d\n", req, whom);
+        // writef("serv.c: recv req[%d] from %d\n", req, whom);
 		// All requests must contain an argument page
 		if (!(perm & PTE_V)) {
 			writef("Invalid request from %08x: no argument page\n", whom);
