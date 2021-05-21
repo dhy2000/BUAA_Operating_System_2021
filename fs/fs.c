@@ -15,7 +15,7 @@ int block_is_free(u_int);
 u_int
 diskaddr(u_int blockno)
 {
-    if (super != NULL && blockno >= super->s_nblocks) {
+    if (super != NULL && blockno > super->s_nblocks) {
         user_panic("^^^^^^ diskaddr: blockno greater than disk's nblocks ^^^^^^^^^");
     }
     return DISKMAP + blockno * BY2BLK;
@@ -271,14 +271,14 @@ read_super(void)
 {
 	int r;
 	void *blk;
-
+    writef("fs: enter read_super\n");
 	// Step 1: read super block.
 	if ((r = read_block(1, &blk, 0)) < 0) {
 		user_panic("cannot read superblock: %e", r);
 	}
 
 	super = blk;
-
+    writef("super->s_magic = %x, s_nblocks = %x\n", super->s_magic, super->s_nblocks);
 	// Step 2: Check fs magic nunber.
 	if (super->s_magic != FS_MAGIC) {
 		user_panic("bad file system magic number %x %x", super->s_magic, FS_MAGIC);

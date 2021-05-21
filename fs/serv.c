@@ -259,7 +259,7 @@ serve(void)
 
 		req = ipc_recv(&whom, REQVA, &perm);
 
-
+        writef("serv.c: recv req[%d] from %d\n", req, whom);
 		// All requests must contain an argument page
 		if (!(perm & PTE_V)) {
 			writef("Invalid request from %08x: no argument page\n", whom);
@@ -314,9 +314,12 @@ umain(void)
 	writef("FS can do I/O\n");
 
 	serve_init();
-	fs_init();
+    // writef("(FS) hhh1\n");
+    fs_init();
+    // writef("(FS) hhh2\n");
 	fs_test();
-
+    // writef("(FS) hhh3\n");
 	serve();
+    writef("(FS) hhh4\n");
 }
 

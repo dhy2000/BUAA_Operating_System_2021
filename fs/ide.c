@@ -8,6 +8,20 @@
 
 #define IDE_PADDR (0x13000000)
 
+// #define DEBUG_IDERW
+// #define DEBUG_SHOWMEM
+
+#ifdef DEBUG_SHOWMEM
+void debug_mem_print(void *start, u_int size) {
+    int i;
+    writef("@%x: ", start);
+    for (i = 0; i < size; i++) {
+        writef("%02x", (u_int)(*((u_char*)start + i)));
+    }
+    writef(" -EOL\n");
+}
+#endif
+
 // Overview:
 // 	read data from IDE disk. First issue a read request through
 // 	disk register and then copy data from disk buffer
@@ -32,8 +46,11 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 	int offset = 0;
     
     int r;
-    u_int reg;
-
+    u_int tmpword;
+    u_char tmpbyte;
+#ifdef DEBUG_IDERW
+    writef("ide_read: diskno=%d, secno=%d, nsecs=%d\n", diskno, secno, nsecs);
+#endif
 	while (offset_begin + offset < offset_end) {
         // Your code here
         // error occurred, then panic.
@@ -45,34 +62,41 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
          * 4. read *0x0030
          * 5. read 512 bytes from 0x4000
          */
-        reg = diskno;
-        if ((r = syscall_write_dev(&reg, IDE_PADDR + 0x0010, 4)) < 0) {
+        tmpword = diskno;
+        if ((r = syscall_write_dev(&tmpword, IDE_PADDR + 0x0010, 4)) < 0) {
             user_panic("ide_read failed.(1 sel diskno)");
         }
         
-        reg = offset;
-        if ((r = syscall_write_dev(&reg, IDE_PADDR + 0x0000, 4)) < 0) {
+        tmpword = offset + offset_begin; // BUG FIX!
+        if ((r = syscall_write_dev(&tmpword, IDE_PADDR + 0x0000, 4)) < 0) {
             user_panic("ide_read failed.(2 sel offset)");
         }
 
-        reg = 0;
-        if ((r = syscall_write_dev(&reg, IDE_PADDR + 0x0020, 1)) < 0) {
+        tmpbyte = 0;
+        if ((r = syscall_write_dev(&tmpbyte, IDE_PADDR + 0x0020, 1)) < 0) {
             user_panic("ide_read failed.(3 set read)");
         }
 
-        if ((r = syscall_read_dev(&reg, IDE_PADDR + 0x0030, 1)) < 0) {
+        if ((r = syscall_read_dev(&tmpbyte, IDE_PADDR + 0x0030, 1)) < 0) {
             user_panic("ide_read failed.(4 fetch status)");
         }
         
-        if (reg == 0) {
+        if (tmpbyte == 0) {
             user_panic("ide_read failed.(5 check status)");
         }
 
         if ((r = syscall_read_dev(dst + offset, IDE_PADDR + 0x4000, BY2SECT)) < 0) {
             user_panic("ide_read failed.(6 read buffer)");
         }
+        // debug_mem_print(dst + offset, BY2SECT);
         offset += BY2SECT;
 	}
+#ifdef DEBUG_IDERW
+    writef("ide_read: read ");
+#ifdef DEBUG_SHOWMEM
+    debug_mem_print(dst, nsecs * BY2SECT);
+#endif
+#endif
 }
 
 
@@ -97,10 +121,20 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
 	int offset_begin = secno * 0x200;
 	int offset_end = offset_begin + nsecs * 0x200;
 	int offset = 0;
-
-	// DO NOT DELETE WRITEF !!!
+#ifdef DEBUG_IDERW
+    writef("ide_write: diskno=%d, secno=%d, nsecs=%d\n", diskno, secno, nsecs);
+#endif
+    // DO NOT DELETE WRITEF !!!
 	writef("diskno: %d\n", diskno);
-    u_int reg;
+#ifdef DEBUG_IDERW 
+    writef("ide_write: will write ");
+#ifdef DEBUG_SHOWMEM
+    debug_mem_print(src, nsecs * BY2SECT);
+#endif
+#endif
+    
+    u_int tmpword;
+    u_char tmpbyte;
     int r;
 	while (offset_begin + offset < offset_end) {
 	    // copy data from source array to disk buffer.
@@ -113,34 +147,38 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
          * 4. *0x0020 = 1 (write)
          * 5. read *0x0030, check status
          */
-        reg = diskno;
-        if ((r = syscall_write_dev(&reg, IDE_PADDR + 0x0010, 4)) < 0) {
+        tmpword = diskno;
+        if ((r = syscall_write_dev(&tmpword, IDE_PADDR + 0x0010, 4)) < 0) {
             user_panic("ide_write failed.(1 sel diskno)");
         }
         
-        reg = offset;
-        if ((r = syscall_write_dev(&reg, IDE_PADDR + 0x0000, 4)) < 0) {
+        tmpword = offset + offset_begin; // BUG FIX!
+        if ((r = syscall_write_dev(&tmpword, IDE_PADDR + 0x0000, 4)) < 0) {
             user_panic("ide_write failed.(2 sel offset)");
         }
 
-        if ((r = syscall_read_dev(src + offset, IDE_PADDR + 0x4000, BY2SECT) < 0)) {
+        if ((r = syscall_write_dev(src + offset, IDE_PADDR + 0x4000, BY2SECT) < 0)) {
             user_panic("ide_write failed.(3 write buffer)");
         }
 
-        reg = 1;
-        if ((r = syscall_write_dev(&reg, IDE_PADDR + 0x0020, 1)) < 0) {
+        tmpbyte = 1;
+        // writef("*(&reg) = %x\n", (u_int)(*(u_char*)(&reg)));
+        if ((r = syscall_write_dev(&tmpbyte, IDE_PADDR + 0x0020, 1)) < 0) {
             user_panic("ide_write failed.(4 set write)");
         }
 
-        if ((r = syscall_read_dev(&reg, IDE_PADDR + 0x0030, 1)) < 0) {
+        if ((r = syscall_read_dev(&tmpbyte, IDE_PADDR + 0x0030, 1)) < 0) {
             user_panic("ide_read failed.(5 fetch status)");
         }
         
-        if (reg == 0) {
+        if (tmpbyte == 0) {
             user_panic("ide_read failed.(6 check status)");
         }
 
         offset += BY2SECT;
 	}
+#ifdef DEBUG_IDERW
+    writef("ide_write: write successfully.\n");
+#endif
 }
 

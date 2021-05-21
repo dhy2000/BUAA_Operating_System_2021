@@ -436,7 +436,7 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	return 0;
 }
 
-#define KSEG1_ADDR (0xa0000000)
+#define KSEG1_ADDR (0xA0000000)
 #define NUM_DEVICES 3
 static u_int dev_start_addr[3] = {0x10000000, 0x13000000, 0x15000000};
 static u_int dev_length[3] = {0x20, 0x4200, 0x200};
@@ -480,7 +480,7 @@ int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
     if (i >= NUM_DEVICES) {
         return -E_INVAL;
     }
-
+    // printf("^ write dev: va(%x) to dev(%x) by len=%d, start_word=%x\n", va, dev, len, (u_int)(*(u_int*)va));
     bcopy((void*)va, (void*)(dev + KSEG1_ADDR), len);
 }
 
@@ -516,5 +516,7 @@ int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
         return -E_INVAL;
     }
 
+    // printf("^ read dev: dev(%x) to va(%x) by len=%d, start_word=%x\n", dev, va, len, (u_int)(*(u_int*)va));
     bcopy((void*)(dev + KSEG1_ADDR), (void*)va, len);
 }
+
