@@ -1,2 +1,8 @@
 gxemul/fs.img
 fs/fsformat
+
+*.o
+*.x
+*.b
+
+gxemul/vmlinux
