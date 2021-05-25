@@ -107,7 +107,9 @@ cons_irq:
     
     // addiu t3, zero, 69
     // sb t3, 0xb0000000
-
+    // mfc0 k0, CP0_STATUS
+    // ori k0, 1
+    // mtc0 k0, CP0_STATUS
     j  ret_from_exception
     nop
 
