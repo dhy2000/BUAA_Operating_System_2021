@@ -35,7 +35,7 @@ void handle_cons_ir(u_int status) {
         printf("interval: %d\n", tim - firsttime);
         if (tim - firsttime >= 5) {
             buf[len] = 0;
-            printf("length = %d, string = %s\n", len, buf);
+            printf("length=%d, string=%s\n", len, buf);
             cons_halt();
         }
     }
