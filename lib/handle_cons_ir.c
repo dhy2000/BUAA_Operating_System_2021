@@ -8,21 +8,25 @@ static int rtc_get_time() {
 }
 
 static char cons_getc() {
+    // printf("cons_getc\n");
     return *(char*)(0x10000000 + 0xA0000000);
 }
 
 static void cons_halt() {
-    *(u_char*)(0x10000000 + 0xA0000000 + 0x10) = 0;
+    *(volatile u_char*)(0x10000000 + 0xA0000000 + 0x10) = 0;
 }
 
 void handle_cons_ir(u_int status) {
     static int count = 0;
     static int firsttime = 0;
-    static char *buf[128];
+    static char buf[128];
     static char len = 0;
+    // printf("orz\n");
     count++;
-    *buf[len++] = cons_getc();
+    // printf("count = %d\n", count);
+    buf[len++] = cons_getc();
     if (count == 1) {
+        // printf("hhh\n");
         firsttime = rtc_get_time();
         printf("CP0 STATUS: %x, 1st interrupt: %d\n", status, firsttime);
     }
@@ -32,6 +36,7 @@ void handle_cons_ir(u_int status) {
         if (tim - firsttime >= 5) {
             buf[len] = 0;
             printf("length = %d, string = %s\n", len, buf);
+            cons_halt();
         }
     }
 
