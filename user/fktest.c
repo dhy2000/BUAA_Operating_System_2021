@@ -6,7 +6,7 @@ void umain()
 	int a = 0;
 	int id = 0;
 
-	if ((id = fork()) == 0) {
+	/*if ((id = fork()) == 0) {
 		if ((id = fork()) == 0) {
 			a += 3;
 
@@ -26,5 +26,10 @@ void umain()
 
 	for (;;) {
 		writef("this is father: a:%d\n", a);
-	}
+	}*/
+
+    int tim = syscall_get_time();
+    writef("time is %d\n", tim);
+
+
 }
