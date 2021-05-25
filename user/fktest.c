@@ -31,5 +31,9 @@ void umain()
     int tim = syscall_get_time();
     writef("time is %d\n", tim);
 
-
+    writef("enter a string:\n");
+    char buf[512];
+    syscall_read_str(buf, 0);
+    writef("You have entered: \"%s\"\n", buf);
+    
 }

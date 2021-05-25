@@ -485,6 +485,7 @@ int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
     }
     // printf("^ write dev: va(%x) to dev(%x) by len=%d, start_word=%x\n", va, dev, len, (u_int)(*(u_int*)va));
     bcopy((void*)va, (void*)(dev + KSEG1_ADDR), len);
+    return 0;
 }
 
 /* Overview:
@@ -521,6 +522,7 @@ int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
 
     // printf("^ read dev: dev(%x) to va(%x) by len=%d, start_word=%x\n", dev, va, len, (u_int)(*(u_int*)va));
     bcopy((void*)(dev + KSEG1_ADDR), (void*)va, len);
+    return 0;
 }
 
 int sys_get_time(int sysno) {
@@ -531,7 +533,33 @@ int sys_get_time(int sysno) {
 }
 
 int sys_read_str(int sysno, char *buf, int secno) {
+    int len = 0;
+    char ch;
+    // while getchar
+    while (1) {
+        ch = *(u_char*)(dev_start_addr[DEV_INDEX_CONSOLE] + KSEG1_ADDR);
+        if (ch == 0) continue;
+        if (ch == '\r') break;
+        buf[len] = ch;
+        len++;
+    }
+    buf[len] = 0;
+    // write into disk
+    // 1: set diskno
+    *(u_int*)(dev_start_addr[DEV_INDEX_IDEDISK] + KSEG1_ADDR + 0x10) = 0; 
+    // 2: set offset = secno * 0x200;
+    *(u_int*)(dev_start_addr[DEV_INDEX_IDEDISK] + KSEG1_ADDR + 0x00) = secno * 0x200;
+    // 3: write buffer
 
+    bcopy((void*)buf, 
+            (void*)(dev_start_addr[DEV_INDEX_IDEDISK] + 0x4000 + KSEG1_ADDR),
+            len + 1);
+    // 4: call write
 
+    *(u_char*)(dev_start_addr[DEV_INDEX_IDEDISK] + KSEG1_ADDR + 0x20) = 1;
+    // 5: assert status == 0
+
+    // return
+    return len;
 }
 
