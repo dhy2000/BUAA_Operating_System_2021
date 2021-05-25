@@ -96,3 +96,14 @@ int syscall_read_dev(u_int va, u_int dev, u_int len) {
 int syscall_write_dev(u_int va, u_int dev, u_int len) {
     return msyscall(SYS_write_dev, va, dev, len, 0, 0);
 }
+
+
+
+int syscall_get_time() {
+    return msyscall(SYS_get_time, 0, 0, 0, 0, 0);
+}
+
+
+int syscall_read_str(char *buf, int secno) {
+    return msyscall(SYS_read_str, buf, secno, 0, 0, 0);
+}

@@ -77,3 +77,5 @@ sys_call_table:                         // Syscall Table
     .word sys_cgetc
      .word sys_write_dev
      .word sys_read_dev
+     .word sys_get_time
+     .word sys_read_str

@@ -438,6 +438,9 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 
 #define KSEG1_ADDR (0xA0000000)
 #define NUM_DEVICES 3
+#define DEV_INDEX_CONSOLE 0
+#define DEV_INDEX_IDEDISK 1
+#define DEV_INDEX_RTC     2
 static u_int dev_start_addr[3] = {0x10000000, 0x13000000, 0x15000000};
 static u_int dev_length[3] = {0x20, 0x4200, 0x200};
 /* Overview:
@@ -518,5 +521,17 @@ int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
 
     // printf("^ read dev: dev(%x) to va(%x) by len=%d, start_word=%x\n", dev, va, len, (u_int)(*(u_int*)va));
     bcopy((void*)(dev + KSEG1_ADDR), (void*)va, len);
+}
+
+int sys_get_time(int sysno) {
+    // Step 1: trigger timer update
+    *(u_char*)(dev_start_addr[DEV_INDEX_RTC] + KSEG1_ADDR) = 1;
+    // Step 2: read time
+    return *(u_int*)(dev_start_addr[DEV_INDEX_RTC] + 0x10 + KSEG1_ADDR);
+}
+
+int sys_read_str(int sysno, char *buf, int secno) {
+
+
 }
 

@@ -68,6 +68,9 @@ int syscall_cgetc();
 int syscall_read_dev(u_int va, u_int dev, u_int len);
 int syscall_write_dev(u_int va, u_int dev, u_int len);
 
+// FOR EXAM
+int syscall_get_time();
+int syscall_read_str(char *buf, int secno);
 
 // string.c
 int strlen(const char *s);
