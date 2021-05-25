@@ -3,6 +3,7 @@
 #include <env.h>
 #include <printf.h>
 #include <kclock.h>
+#include <kcons.h>
 #include <trap.h>
 
 extern char aoutcode[];
@@ -24,12 +25,12 @@ void mips_init()
 	trap_init();
 	// initialize PIT.
 	kclock_init();
-
+    kcons_init();
 	// Create process using macro 'ENC_CREATE'
 	// For more details about 'ENV_CREATE', see include/env.h
     // ENV_CREATE(user_fstest);
     // ENV_CREATE(fs_serv);
-    ENV_CREATE(user_fktest);
+    // ENV_CREATE(user_fktest);
 	panic("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 
 	while (1);

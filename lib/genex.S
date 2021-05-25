@@ -2,6 +2,7 @@
 #include <asm/cp0regdef.h>
 #include <asm/asm.h>
 #include <stackframe.h>
+// #include <kcons.h>
 
 .macro	__build_clear_sti
 	STI
@@ -58,9 +59,20 @@ mfc0	t0, CP0_CAUSE
 mfc0	t2, CP0_STATUS
 and	t0, t2
 
+    // write something to console
+    addiu t3, zero, 65
+    sb t3, 0xb0000000
+
 andi	t1, t0, STATUSF_IP4
 bnez	t1, timer_irq
 nop
+
+    addiu t3, zero, 66
+    sb t3, 0xb0000000
+andi    t1, t0, 0x400
+bnez    t1, cons_irq
+nop
+
 END(handle_int)
 
 	.extern delay
@@ -77,6 +89,28 @@ timer_irq:
 	nop*/
 	j	ret_from_exception
 	nop
+
+cons_irq:
+    
+    addiu t3, zero, 67
+    sb t3, 0xb0000000
+
+    // a0 = cp0_status
+    move a0, t2
+    
+
+    addiu t3, zero, 68
+    sb t3, 0xb0000000
+
+    jal handle_cons_ir
+    nop
+    
+    addiu t3, zero, 69
+    sb t3, 0xb0000000
+
+    j  ret_from_exception
+    nop
+
 
 LEAF(do_reserved)
 END(do_reserved)
