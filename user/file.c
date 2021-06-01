@@ -280,7 +280,6 @@ sync(void)
 
 int user_create(const char *path, int isdir) {
     return fsipc_create(path, isdir);
-
 }
 
 

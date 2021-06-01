@@ -95,6 +95,6 @@ struct Fsreq_remove {
 struct Fsreq_create {
     u_char req_path[MAXPATHLEN];
     u_int req_isdir;
-}
+};
 
 #endif // _FS_H_

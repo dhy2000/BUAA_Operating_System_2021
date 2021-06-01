@@ -251,7 +251,14 @@ serve_sync(u_int envid)
 
 void serve_create(u_int envid, struct Fsreq_create *rq)
 {
-
+    int r;
+    char path[MAXPATHLEN];
+    strcpy(path, rq->req_path);
+    struct File *f;
+    if ((r = file_create(path, &f)) < 0) {
+        ipc_send(envid, r, 0, 0);
+        return;
+    }
 
     ipc_send(envid, 0, 0, 0);
 }
