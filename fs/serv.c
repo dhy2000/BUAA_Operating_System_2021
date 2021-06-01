@@ -258,12 +258,33 @@ void serve_create(u_int envid, struct Fsreq_create *rq)
     
     
     
-    
-    if ((r = file_create(path, &f)) < 0) {
-        ipc_send(envid, r, 0, 0);
-        return;
+    if ((rq->req_isdir) & 0x2) {
+        char *p = path;
+        // assert *p == '/';
+        p++;
+        while (*p) {
+            while (*p && *p != '/') p++;
+            if (!*p) break;
+            *p = 0;
+            r = file_create(path, &f);
+            if (r < 0 && r != -E_FILE_EXISTS) {
+                ipc_send(envid, r, 0, 0);
+                return;
+            }
+            f->f_type = FTYPE_DIR;
+            *p = '/';
+        }
+        if ((r = file_create(path, &f)) < 0) {
+            ipc_send(envid, r, 0, 0);
+            return;
+        }
+    } else {
+        if ((r = file_create(path, &f)) < 0) {
+            ipc_send(envid, r, 0, 0);
+            return;
+        }
     }
-    if (rq->req_isdir) {
+    if ((rq->req_isdir) & 0x1) {
         f->f_type = FTYPE_DIR;
     } else {
         f->f_type = FTYPE_REG;
