@@ -23,6 +23,6 @@
 // ^^^ Exam ^^^
 #define E_DIR_NOT_EXIST  13 // Directory not exist
 
-#define MAXERROR 12
+#define MAXERROR 13
 
 #endif // _ERROR_H_
