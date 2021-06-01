@@ -264,12 +264,12 @@ void serve_create(u_int envid, struct Fsreq_create *rq)
             while (*p && *p != '/') p++;
             if (!*p) break;
             *p = 0;
-            r = file_create(path, &f, isdir);
+            r = file_create(path, &f, FTYPE_DIR);
             if (r < 0 && r != -E_FILE_EXISTS) {
                 ipc_send(envid, r, 0, 0);
                 return;
             }
-            f->f_type = FTYPE_DIR;
+            // f->f_type = FTYPE_DIR;
             *p = '/';
             p++;
         }
