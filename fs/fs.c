@@ -720,7 +720,9 @@ file_create(char *path, struct File **file)
 	if ((r = walk_path(path, &dir, &f, name)) == 0) {
 		return -E_FILE_EXISTS;
 	}
-
+    if (r == -E_NOT_FOUND && dir == 0) {
+        return -E_DIR_NOT_EXIST;
+    }
 	if (r != -E_NOT_FOUND || dir == 0) {
 		return r;
 	}
