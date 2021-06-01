@@ -255,11 +255,10 @@ void serve_create(u_int envid, struct Fsreq_create *rq)
     char path[MAXPATHLEN];
     strcpy(path, rq->req_path);
     struct File *f;
-    /*if (rq->req_isdir) {
-        // directly return err
-        ipc_send(envid, -E_DIR_NOT_EXIST, 0, 0);
-        return;
-    }*/
+    
+    
+    
+    
     if ((r = file_create(path, &f)) < 0) {
         ipc_send(envid, r, 0, 0);
         return;
