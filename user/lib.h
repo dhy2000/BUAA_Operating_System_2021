@@ -7,6 +7,7 @@
 #include <env.h>
 #include <args.h>
 #include <unistd.h>
+#include <error.h>
 /////////////////////////////////////////////////////head
 extern void umain();
 extern void libmain();

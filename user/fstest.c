@@ -63,6 +63,14 @@ void umain()
 		user_panic("open after remove /newmotd: %d",r);
 	}
 	writef("file remove: OK\n");
+        
+        if ((r = user_create("/testfile", 0)) < 0) {
+            if (r == -E_DIR_NOT_EXIST) {
+                writef("hhhh dir not exist\n");
+            }
+            user_panic("exam create failed: %d", r);
+        }
+        writef("file create test: OK\n");
         while (1) {
                 //writef("IDLE!");
         }
