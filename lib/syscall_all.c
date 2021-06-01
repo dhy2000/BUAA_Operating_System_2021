@@ -482,6 +482,7 @@ int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
     }
     // printf("^ write dev: va(%x) to dev(%x) by len=%d, start_word=%x\n", va, dev, len, (u_int)(*(u_int*)va));
     bcopy((void*)va, (void*)(dev + KSEG1_ADDR), len);
+    return 0;
 }
 
 /* Overview:
@@ -518,5 +519,6 @@ int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
 
     // printf("^ read dev: dev(%x) to va(%x) by len=%d, start_word=%x\n", dev, va, len, (u_int)(*(u_int*)va));
     bcopy((void*)(dev + KSEG1_ADDR), (void*)va, len);
+    return 0;
 }
 
