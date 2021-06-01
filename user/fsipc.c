@@ -148,3 +148,7 @@ fsipc_sync(void)
 	return fsipc(FSREQ_SYNC, fsipcbuf, 0, 0);
 }
 
+int fsipc_create(const char *path, int isdir) {
+
+
+}

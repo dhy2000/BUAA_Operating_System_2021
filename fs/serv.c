@@ -249,6 +249,14 @@ serve_sync(u_int envid)
 	ipc_send(envid, 0, 0, 0);
 }
 
+void serve_create(u_int envid, struct Fsreq_create *rq)
+{
+
+
+    ipc_send(envid, 0, 0, 0);
+}
+
+
 void
 serve(void)
 {
@@ -294,6 +302,9 @@ serve(void)
 			case FSREQ_SYNC:
 				serve_sync(whom);
 				break;
+            case FSREQ_CREATE:
+                serve_create(whom, (struct Fsreq_create *)REQVA);
+                break;
 
 			default:
 				writef("Invalid request code %d from %08x\n", whom, req);
