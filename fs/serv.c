@@ -255,9 +255,7 @@ void serve_create(u_int envid, struct Fsreq_create *rq)
     char path[MAXPATHLEN];
     strcpy(path, rq->req_path);
     struct File *f;
-    
-    
-    
+    int isdir = ((rq->req_isdir) & 0x1) ? FTYPE_DIR : FTYPE_REG;
     if ((rq->req_isdir) & 0x2) {
         char *p = path;
         // assert *p == '/';
@@ -266,7 +264,7 @@ void serve_create(u_int envid, struct Fsreq_create *rq)
             while (*p && *p != '/') p++;
             if (!*p) break;
             *p = 0;
-            r = file_create(path, &f);
+            r = file_create(path, &f, isdir);
             if (r < 0 && r != -E_FILE_EXISTS) {
                 ipc_send(envid, r, 0, 0);
                 return;
@@ -275,21 +273,21 @@ void serve_create(u_int envid, struct Fsreq_create *rq)
             *p = '/';
             p++;
         }
-        if ((r = file_create(path, &f)) < 0) {
+        if ((r = file_create(path, &f, isdir)) < 0) {
             ipc_send(envid, r, 0, 0);
             return;
         }
     } else {
-        if ((r = file_create(path, &f)) < 0) {
+        if ((r = file_create(path, &f, isdir)) < 0) {
             ipc_send(envid, r, 0, 0);
             return;
         }
     }
-    if ((rq->req_isdir) & 0x1) {
+    /*if ((rq->req_isdir) & 0x1) {
         f->f_type = FTYPE_DIR;
     } else {
         f->f_type = FTYPE_REG;
-    }
+    }*/
     ipc_send(envid, 0, 0, 0);
 }
 
