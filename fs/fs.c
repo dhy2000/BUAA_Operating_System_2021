@@ -539,6 +539,8 @@ dir_lookup(struct File *dir, char *name, struct File **file, int ftype)
 	u_int i, j, nblock;
 	void *blk;
 	struct File *f;
+    
+    // writef("fs: dir_lookup dir=%s, name=%s, ftype=%d\n", dir->f_name, name, ftype);
 
 	// Step 1: Calculate nblock: how many blocks this dir have.
     nblock = ROUND(dir->f_size, BY2BLK) / BY2BLK;
@@ -666,7 +668,7 @@ walk_path(char *path, struct File **pdir, struct File **pfile, char *lastelem, i
 		if (dir->f_type != FTYPE_DIR) {
 			return -E_NOT_FOUND;
 		}
-        int dirlook_ftype = -1;
+        int dirlook_ftype = FTYPE_DIR;
         if (*path == 0) dirlook_ftype = ftype;
 		if ((r = dir_lookup(dir, name, &file, dirlook_ftype)) < 0) {
 			if (r == -E_NOT_FOUND && *path == '\0') {
@@ -717,9 +719,9 @@ file_create(char *path, struct File **file, int ftype)
 	char name[MAXNAMELEN];
 	int r;
 	struct File *dir, *f;
-
+    // writef("fs: creating %s:(%d) ;\n", path, ftype);
 	if ((r = walk_path(path, &dir, &f, name, ftype)) == 0) {
-		if (f->f_type == ftype)
+		//if (f->f_type == ftype)
             return -E_FILE_EXISTS;
 	}
     if (r == -E_NOT_FOUND && dir == 0) {

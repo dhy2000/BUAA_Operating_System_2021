@@ -3,6 +3,16 @@
 static char *msg = "This is the NEW message of the day!\r\n\r\n";
 static char *diff_msg = "This is a different massage of the day!\r\n\r\n";
 
+void tryCreate(const char *path, int isdir) {
+    writef("Trying to create %s:(%d) ...\n", path, isdir);
+    int r;
+    if ((r = user_create(path, isdir)) < 0) {
+        writef("failed to create %s:(%d), err=%d\n", path, isdir, r);
+        return;
+    }
+    writef("successful create %s:(%d)\n", path, isdir);
+}
+
 void umain()
 {
         int r;
@@ -71,6 +81,12 @@ void umain()
             user_panic("exam create failed: %d", r);
         }
         writef("file create test: OK\n");
+        
+        tryCreate("/A", 0);
+        tryCreate("/A", 1);
+        tryCreate("/A/B", 2);
+        tryCreate("/A/B/C", 3);
+        
         while (1) {
                 //writef("IDLE!");
         }
