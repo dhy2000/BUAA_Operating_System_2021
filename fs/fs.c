@@ -533,7 +533,7 @@ file_dirty(struct File *f, u_int offset)
 //	return 0 on success, and set the pointer to the target file in `*file`.
 //		< 0 on error.
 int
-dir_lookup(struct File *dir, char *name, struct File **file)
+dir_lookup(struct File *dir, char *name, struct File **file, int ftype)
 {
 	int r;
 	u_int i, j, nblock;
@@ -554,7 +554,7 @@ dir_lookup(struct File *dir, char *name, struct File **file)
 		// If we find the target file, set the result to *file and set f_dir field.
 		for (j = 0; j < FILE2BLK; j++) {
             f = ((struct File*) blk) + j;
-            if (strcmp(f->f_name, name) == 0) {
+            if (strcmp(f->f_name, name) == 0 && (ftype == -1 || f->f_type == ftype)) {
                 f->f_dir = dir;
                 *file = f;
                 return 0;
@@ -627,7 +627,7 @@ skip_slash(char *p)
 //	If we cannot find the file but find the directory it should be in, set 
 //	*pdir and copy the final path element into lastelem.
 int
-walk_path(char *path, struct File **pdir, struct File **pfile, char *lastelem)
+walk_path(char *path, struct File **pdir, struct File **pfile, char *lastelem, int ftype)
 {
 	char *p;
 	char name[MAXNAMELEN];
@@ -666,8 +666,9 @@ walk_path(char *path, struct File **pdir, struct File **pfile, char *lastelem)
 		if (dir->f_type != FTYPE_DIR) {
 			return -E_NOT_FOUND;
 		}
-
-		if ((r = dir_lookup(dir, name, &file)) < 0) {
+        int dirlook_ftype = -1;
+        if (*path == 0) dirlook_ftype = ftype;
+		if ((r = dir_lookup(dir, name, &file, dirlook_ftype)) < 0) {
 			if (r == -E_NOT_FOUND && *path == '\0') {
 				if (pdir) {
 					*pdir = dir;
@@ -701,7 +702,7 @@ walk_path(char *path, struct File **pdir, struct File **pfile, char *lastelem)
 int
 file_open(char *path, struct File **file)
 {
-	return walk_path(path, 0, file, 0);
+	return walk_path(path, 0, file, 0, -1);
 }
 
 // Overview:
@@ -717,7 +718,7 @@ file_create(char *path, struct File **file, int ftype)
 	int r;
 	struct File *dir, *f;
 
-	if ((r = walk_path(path, &dir, &f, name)) == 0) {
+	if ((r = walk_path(path, &dir, &f, name, ftype)) == 0) {
 		if (f->f_type == ftype)
             return -E_FILE_EXISTS;
 	}
@@ -854,7 +855,7 @@ file_remove(char *path)
 	struct File *f;
 
 	// Step 1: find the file on the disk.
-	if ((r = walk_path(path, 0, &f, 0)) < 0) {
+	if ((r = walk_path(path, 0, &f, 0, -1)) < 0) {
 		return r;
 	}
 
