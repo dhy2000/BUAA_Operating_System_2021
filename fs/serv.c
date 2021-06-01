@@ -273,6 +273,7 @@ void serve_create(u_int envid, struct Fsreq_create *rq)
             }
             f->f_type = FTYPE_DIR;
             *p = '/';
+            p++;
         }
         if ((r = file_create(path, &f)) < 0) {
             ipc_send(envid, r, 0, 0);
