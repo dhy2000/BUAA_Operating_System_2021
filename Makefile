@@ -13,6 +13,7 @@ fs_dir		  := fs
 mm_dir		  := mm
 tools_dir	  := tools
 vmlinux_elf	  := gxemul/vmlinux
+user_disk     := gxemul/fs.img
 
 link_script   := $(tools_dir)/scse0_3.lds
 
@@ -27,7 +28,7 @@ objects		  := $(boot_dir)/start.o			  \
 				 $(fs_dir)/*.x \
 				 $(mm_dir)/*.o
 
-.PHONY: all $(modules) clean startos debug
+.PHONY: all $(modules) clean
 
 all: $(modules) vmlinux
 
@@ -42,12 +43,6 @@ clean:
 		do					\
 			$(MAKE) --directory=$$d clean; \
 		done; \
-	rm -rf *.o *~ $(vmlinux_elf)
-
-startos:
-	gxemul -E testmips -C R3000 -M 64 -d gxemul/fs.img gxemul/vmlinux
-
-debug:
-	gxemul -E testmips -C R3000 -M 64 -d gxemul/fs.img gxemul/vmlinux -V
+	rm -rf *.o *~ $(vmlinux_elf)  $(user_disk)
 
 include include.mk
