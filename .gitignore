@@ -6,3 +6,6 @@ fs/fsformat
 *.b
 
 gxemul/vmlinux
+
+# ctags
+tags
