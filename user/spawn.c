@@ -186,16 +186,18 @@ int spawn(char *prog, char **argv)
 	// Note 0: some variable may be not used,you can cancel them as you like
 	// Step 1: Open the file specified by `prog` (prog is the path of the program)
 	if((r=open(prog, O_RDONLY))<0){
-		user_panic("spawn ::open line 102 RDONLY wrong !\n");
+		writef("spawn ::open line 102 RDONLY wrong !\n");
 		return r;
 	}
 	// Your code begins here
     fd = r;
     r = readn(fd, elfbuf, sizeof(Elf32_Ehdr));
-    if (r < 0) { user_panic("spawn failed: read Ehdr"); }
+    if (r < 0) { writef("spawn failed: read Ehdr"); return r; } 
     elf = (Elf32_Ehdr*) elfbuf;
-    if ((!usr_is_elf_format((u_char*)elf)) || (elf->e_type != 2)) // EXEC
-        user_panic("spawn failed: not executable elf");
+    if ((!usr_is_elf_format((u_char*)elf)) || (elf->e_type != 2)) { // EXEC
+        writef("spawn failed: not executable elf");
+        return -E_UNSPECIFIED;
+    }
     size = elf->e_phentsize;
     text_start = elf->e_phoff;
     phnum = elf->e_phnum;
@@ -204,8 +206,10 @@ int spawn(char *prog, char **argv)
 	// Before Step 2 , You had better check the "target" spawned is a execute bin 
 	// Step 2: Allocate an env (Hint: using syscall_env_alloc())
     child_envid = syscall_env_alloc();
-    if (child_envid < 0) 
-        user_panic("spawn failed: alloc a new env");
+    if (child_envid < 0) {
+        writef("spawn failed: alloc a new env");
+        return -E_UNSPECIFIED;
+    }
 
 
 	// Step 3: Using init_stack(...) to initialize the stack of the allocated env
@@ -222,13 +226,13 @@ int spawn(char *prog, char **argv)
     
     for (i = 0; i < phnum; i++) {
         r = seek(fd, text_start);
-        if (r < 0) user_panic("spawn failed: seek");
+        if (r < 0) { writef("spawn failed: seek"); return r; }
         r = readn(fd, elfbuf, size);
-        if (r < 0) user_panic("spawn failed: readn elf");
+        if (r < 0) { writef("spawn failed: readn elf"); return r; }
         ph = (Elf32_Phdr*) elfbuf;
         if (ph->p_type == PT_LOAD) {
             r = usr_load_elf(fd, ph, child_envid);
-            if (r < 0) { user_panic("spawn failed: load elf "); }
+            if (r < 0) { writef("spawn failed: load elf "); return r; }
         }
         text_start += size;
     }

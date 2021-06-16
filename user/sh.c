@@ -89,6 +89,9 @@ again:
 	argc = 0;
 	for(;;){
 		c = gettoken(0, &t);
+        if (c != 0) {
+            writef("@@@ shell: TOKEN = %s\n", t);
+        }
 		switch(c){
 		case 0:
 			goto runit;
@@ -105,6 +108,7 @@ again:
 				exit();
 			}
 			// Your code here -- open t for reading,
+            writef("@@@ shell: will open %s for read\n", t);
 			r = open(t, O_RDONLY);
             if (r < 0) {user_panic("sh.c failed to open file");}
             fd = r;
@@ -117,8 +121,12 @@ again:
 		case '>':
 			// Your code here -- open t for writing,
 			
-            
-			r = open(t, O_WRONLY);
+			if(gettoken(0, &t) != 'w'){
+				writef("syntax error: < not followed by word\n");
+				exit();
+			}
+            writef("@@@ shell: will open %s for write\n", t);
+			r = open(t, O_WRONLY | O_CREAT);
             if (r < 0) {user_panic("sh.c failed to open file");}
             fd = r;
             dup(fd, 1);
@@ -177,6 +185,7 @@ runit:
 
 	if ((r = spawn(argv[0], argv)) < 0)
 		writef("spawn %s: %e\n", argv[0], r);
+    // user_panic("@@@@\n");
 	close_all();
 	if (r >= 0) {
 		if (debug_) writef("[%08x] WAIT %s %08x\n", env->env_id, argv[0], r);
