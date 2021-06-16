@@ -29,11 +29,17 @@ umain(void)
 			writef("\ngot %d bytes: %s\n", i, buf);
 		exit();
 	} else {
+        writef("*** I am the writer!\n");
 		writef("[%08x] pipereadeof close %d\n", env->env_id, p[0]);
-		close(p[0]);
+		writef("*** Writer before close readside: isclosed=%d,%d\n", pipeisclosed((p[0])), pipeisclosed((p[1])));
+        close(p[0]);
+
+		writef("*** Writer after close readside: isclosed=%d,%d\n", pipeisclosed((p[0])), pipeisclosed((p[1])));
 		writef("[%08x] pipereadeof write %d\n", env->env_id, p[1]);
-		if ((i=write(p[1], msg, strlen(msg))) != strlen(msg))
+		writef("*** Writer will write\n");
+        if ((i=write(p[1], msg, strlen(msg))) != strlen(msg))
 			user_panic("write: %e", i);
+        writef("*** Writer write done\n");
 		close(p[1]);
 	}
 	wait(pid);

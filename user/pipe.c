@@ -87,13 +87,22 @@ _pipeisclosed(struct Fd *fd, struct Pipe *p)
 	int pfd,pfp,runs;
 	
     // to ensure synchronized
-    while (1) {
+    /*while (1) {
         runs = env->env_runs;
         pfd = pageref(fd);
         pfp = pageref(p);
         if (runs == env->env_runs)
             break;
-    }
+    }*/
+    do {
+        runs = env->env_runs;
+        pfd = pageref(fd);
+        pfp = pageref(p);
+
+    } while (runs != env->env_runs);
+    
+    writef(">_< _pipeisclosed check: envid=%d, runs=%d, pfd=%d, pfp=%d\n",
+            env->env_id, env->env_runs, pfd, pfp);
 
     return (pfd == pfp) ? 1 : 0;
 
@@ -130,23 +139,29 @@ piperead(struct Fd *fd, void *vbuf, u_int n, u_int offset)
 	struct Pipe *p;
 	char *rbuf;
 	
+    // writef("--- piperead ---\n");
     p = (struct Pipe *)fd2data(fd);
 
-    while (p->p_rpos == p->p_wpos) {
-        if (_pipeisclosed(fd, p)) 
+    writef("--- piperead: p->p_wpos=%d, p->p_rpos=%d ---\n", p->p_wpos, p->p_rpos);
+    while (p->p_rpos >= p->p_wpos) {
+        if (pipeisclosed(fd2num(fd))) 
             return 0;
+            // break;
         syscall_yield();
     }
 
     rbuf = (char*)vbuf;
-    for (i = 0; i < n; i++) {
-        while (p->p_rpos == p->p_wpos) {
+    /*for (i = 0; i < n; i++) {
+        while (p->p_rpos < p->p_wpos) {
             if (i > 0 || _pipeisclosed(fd, p))
                 return i;
             syscall_yield();
         }
         rbuf[i] = p->p_buf[p->p_rpos % BY2PIPE];
         p->p_rpos++;
+    }*/
+    for (i = 0; i < n && p->p_rpos < p->p_wpos; i++, p->p_rpos++) {
+        rbuf[i] = p->p_buf[p->p_rpos % BY2PIPE];
     }
     return n;
 
@@ -168,19 +183,24 @@ pipewrite(struct Fd *fd, const void *vbuf, u_int n, u_int offset)
 	struct Pipe *p;
 	char *wbuf;
 	
-    
+
     p = (struct Pipe *)fd2data(fd);
     wbuf = (char*)vbuf;
+    writef("--- pipewrite start: %d bytes, p->p_wpos=%d, p->p_rpos=%d ---\n", n, p->p_wpos, p->p_rpos);
     
     for (i = 0; i < n; i++) {
         while (p->p_wpos - p->p_rpos == BY2PIPE) {
-            if (_pipeisclosed(fd, p))
-                return 0;
+            writef("--- pipewrite blocks where wpos=%d, rpos=%d\n", p->p_wpos, p->p_rpos);
+            if (pipeisclosed(fd2num(fd))) {
+                writef("--< pipewrite terminated because pipe closed\n");
+                return i;
+            }
             syscall_yield();
         }
         p->p_buf[p->p_wpos % BY2PIPE] = wbuf[i];
         p->p_wpos++;
     }
+    writef("--< pipewrite done write %d bytes, wpos=%d, rpos=%d\n", n, p->p_wpos, p->p_rpos);
     return n;
 
 
@@ -204,6 +224,7 @@ pipestat(struct Fd *fd, struct Stat *stat)
 static int
 pipeclose(struct Fd *fd)
 {
+    writef("--<< pipe close\n");
     u_int tmp = fd;
     syscall_mem_unmap(0, fd);
 	syscall_mem_unmap(0, fd2data(tmp));
