@@ -116,10 +116,27 @@ serve_open(u_int envid, struct Fsreq_open *rq)
 	fileid = r;
 
 	// Open the file.
+    
+
 	if ((r = file_open((char *)path, &f)) < 0) {
-	//	user_panic("file_open failed: %d, invalid path: %s", r, path);
-		ipc_send(envid, r, 0, 0);
-		return ;
+        // MyLab6: add support for O_CREAT
+        if (( (rq->req_omode) & O_CREAT )) {
+            r = file_create((char *)path, &f);
+            if (r < 0) {
+                ipc_send(envid, r, 0, 0);
+                return ;
+            }
+            r = file_open((char *)path, &f);
+            if (r < 0) {
+                ipc_send(envid, r, 0, 0);
+                return ;
+            }
+        
+        } else {
+		    // user_panic("file_open failed: %d, invalid path: %s", r, path);
+		    ipc_send(envid, r, 0, 0);
+		    return ;
+        }
 	}
 
 	// Save the file pointer.
