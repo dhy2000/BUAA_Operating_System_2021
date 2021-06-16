@@ -28,7 +28,7 @@ objects		  := $(boot_dir)/start.o			  \
 				 $(fs_dir)/*.x \
 				 $(mm_dir)/*.o
 
-.PHONY: all $(modules) clean startos debug
+.PHONY: all $(modules) clean startos debug rebuild
 
 all: $(modules) vmlinux
 
@@ -44,6 +44,9 @@ clean:
 			$(MAKE) --directory=$$d clean; \
 		done; \
 	rm -rf *.o *~ $(vmlinux_elf)  $(user_disk)
+
+rebuild:
+	{ $(MAKE) clean && $(MAKE) ; } 1>/dev/null 2>&1
 
 startos:
 	gxemul -E testmips -C R3000 -M 64 -d gxemul/fs.img gxemul/vmlinux
