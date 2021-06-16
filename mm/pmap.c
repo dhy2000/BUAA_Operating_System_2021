@@ -357,6 +357,7 @@ page_insert(Pde *pgdir, struct Page *pp, u_long va, u_int perm)
         return -E_NO_MEM;
     }
     /* Step 3.2 Insert page and increment the pp_ref */
+    // printf("_[page_insert: %08x]_: PPN(pp)=%d, pp_ref=%d ++\n", (curenv == NULL ? 0 : curenv->env_id), page2ppn(pp), pp->pp_ref);
     pp->pp_ref++;
     *pgtable_entry = ( (page2pa(pp)) | (PERM) ); 
     return 0;
@@ -399,6 +400,7 @@ page_lookup(Pde *pgdir, u_long va, Pte **ppte)
 // Overview:
 // 	Decrease the `pp_ref` value of Page `*pp`, if `pp_ref` reaches to 0, free this page.
 void page_decref(struct Page *pp) {
+    // printf("_[page_decref:%08x]_: ppn=%d, ref=%d ;\n", (curenv == NULL ? 0 : curenv->env_id), page2ppn(pp), pp->pp_ref);
     if(--pp->pp_ref == 0) {
         page_free(pp);
     }
@@ -422,6 +424,7 @@ page_remove(Pde *pgdir, u_long va)
     /* Step 2: Decrease `pp_ref` and decide if it's necessary to free this page. */
 
     /* Hint: When there's no virtual address mapped to this page, release it. */
+    // printf("_[page_remove:%08x]_: ppn=%d, ref=%d ;\n", (curenv == NULL ? 0 : curenv->env_id), page2ppn(ppage), ppage->pp_ref);
     ppage->pp_ref--;
     if (ppage->pp_ref == 0) {
         page_free(ppage);
