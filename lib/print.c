@@ -43,101 +43,84 @@ lp_Print(void (*output)(void *, char *, int),
       (*output)(arg, s, l); \
     } \
   }
-    
+   
+
+
     char buf[LP_MAX_BUF];
 
-    char c = 0;
-    char *s = buf;
-    long int num = 0;
+    char c;
+    char *s;
+    long int num;
 
-	
+    int longFlag;
+    int negFlag;
+    int width;
+    int prec;
+    int ladjust;
+    char padc;
 
-    int longFlag = 0;
-    int negFlag = 0;
-    int width = 0;
-    int prec = 0;
-    int ladjust = 0;
-    char padc = 0;
-
-    int length = 0;
-
-    int stypeid = 0;
-
-    void *saddr = arg;
-
-    /*
-        Exercise 1.5. Please fill in two parts in this file.
-    */
+    int length;
 
     for(;;) {
-
-        /* Part1: your code here */
-    while (*fmt != '\0' && *fmt != '%')
 	{ 
 	    /* scan for the next '%' */
+	    char *fmtStart = fmt;
+	    while ( (*fmt != '\0') && (*fmt != '%')) {
+		fmt ++;
+	    }
+
 	    /* flush the string found so far */
-        OUTPUT(arg, fmt, 1);
-	    /* check "are we hitting the end?" */
-        fmt++;
+	    OUTPUT(arg, fmtStart, fmt-fmtStart);
+
+	    /* are we hitting the end? */
+	    if (*fmt == '\0') break;
 	}
-    
-    if (*fmt == '\0')
-        break;
-	
+
 	/* we found a '%' */
-	fmt++;
+	fmt ++;
+	
 	/* check for long */
-    
+	if (*fmt == 'l') {
+	    longFlag = 1;
+	    fmt ++;
+	} else {
+	    longFlag = 0;
+	}
+
 	/* check for other prefixes */
+	width = 0;
+	prec = -1;
+	ladjust = 0;
+	padc = ' ';
 
-	/* check format flag */
-    
-    // %[flags][width][.precsion][length][typeid]specifier
+	if (*fmt == '-') {
+	    ladjust = 1;
+	    fmt ++;
+	}
 
-    // [flags]
-    if (*fmt == '-') {
-        ladjust = 1;
-        fmt++;
-    } else if (*fmt == '0') {
-        padc = '0';
-        fmt++;
-    } else {
-        ladjust = 0;
-        padc = ' ';
-    }
-    // [width]
-    width = 0;
-    while (IsDigit(*fmt)) {
-        width = (width << 3) + (width << 1) + (Ctod(*fmt));
-        fmt++;
-    }
-    // [.precision]
-    if (*fmt == '.') {
-        fmt++;
-        prec = 0;
-        while (IsDigit(*fmt)) {
-            prec = (prec << 3) + (prec << 1) + (Ctod(*fmt));
-            fmt++;
-        }
-    }
-    // [length]
-    if (*fmt == 'l') {
-        longFlag = 1;
-        fmt++;
-    }
+	if (*fmt == '0') {
+	    padc = '0';
+	    fmt++;
+	}
 
-    // [stypeid]
-    if (*fmt == '$') {
-        fmt++;
-        if (*fmt == '1') {
-            stypeid = 1;
-        } else {
-            stypeid = 2;
-        }
-        fmt++;
-    }
-    
-	negFlag = 0;
+	if (IsDigit(*fmt)) {
+	    while (IsDigit(*fmt)) {
+		width = 10 * width + Ctod(*fmt++);
+	    }
+	}
+
+	if (*fmt == '.') {
+	    fmt ++;
+	    if (IsDigit(*fmt)) {
+		prec = 0;
+		while (IsDigit(*fmt)) {
+		    prec = prec*10 + Ctod(*fmt++);
+		}
+	    }
+	}
+
+
+    negFlag = 0;
 	switch (*fmt) {
 	 case 'b':
 	    if (longFlag) { 
@@ -157,11 +140,6 @@ lp_Print(void (*output)(void *, char *, int),
 		num = va_arg(ap, int); 
 	    }
 	    
-		/*  Part2:
-			your code here.
-			Refer to other part (case 'b',case 'o' etc.) and func PrintNum to complete this part.
-			Think the difference between case 'd' and others. (hint: negFlag).
-		*/
         if (num < 0) {
             negFlag = 1;
             num = -num;
@@ -224,17 +202,6 @@ lp_Print(void (*output)(void *, char *, int),
 	    OUTPUT(arg, buf, length);
 	    break;
      
-    case 'T':
-        saddr = (void*)va_arg(ap, void *);
-        if (stypeid == 1)
-            // length = PrintChar(buf, '.', width, ladjust);
-            length = PrintS1(buf, saddr, width, ladjust, padc);
-        else
-            // length = PrintChar(buf, '.', width, ladjust);
-            length = PrintS2(buf, saddr, width, ladjust, padc);
-        OUTPUT(arg, buf, length);
-        break;
-
 
 	 case '\0':
 	    fmt --;
@@ -254,91 +221,7 @@ lp_Print(void (*output)(void *, char *, int),
 
 
 /* --------------- local help functions --------------------- */
-struct s1 {
-    int a;
-    char b;
-    char c;
-    int d;
-};
-
-    
-int
-PrintS1(char * buf, void * addr, int width, int ladjust, char padc)
-{
-    int length = 0;
-    char *head = buf;
-    struct s1 *ps1 = (struct s1*) addr;
-    // '{'
-    *(head++) = '{';
-    // int a
-    long int na = ps1->a;
-    if (na < 0)
-        length = PrintNum(head, -na, 10, 1, width, ladjust, padc, 0);
-    else
-        length = PrintNum(head, na, 10, 0, width, ladjust, padc, 0);
-    head += length;
-    // ','
-    *(head++) = ',';
-    // char b
-    length = PrintChar(head, ps1->b, width, ladjust);
-    head += length;
-    // ','
-    *(head++) = ',';
-    // char c
-    length = PrintChar(head, ps1->c, width, ladjust);
-    head += length;
-    // ','
-    *(head++) = ',';
-    // int d
-    long int nd = ps1->d;
-    if (nd < 0)
-        length = PrintNum(head, -nd, 10, 1, width, ladjust, padc, 0);
-    else
-        length = PrintNum(head, nd, 10, 0, width, ladjust, padc, 0);
-    head += length;
-    // '}'
-    *(head++) = '}';
-    return head - buf;
-}
-
-struct s2 {
-    int size;
-    int c[];
-};
-
-int
-PrintS2(char * buf, void * addr, int width, int ladjust, char padc)
-{
-    int length = 0;
-    char *head = buf;
-    struct s2 *ps2 = (struct s2*) addr;
-    int i = 0;
-    // '{'
-    *(head++) = '{';
-    // int size
-    long int s2size = ps2->size;
-    if (s2size < 0)
-        length = PrintNum(head, -s2size, 10, 1, width, ladjust, padc, 0);
-    else
-        length = PrintNum(head, s2size, 10, 0, width, ladjust, padc, 0);
-    head += length;
-    for (i = 0; i < s2size; i++) {
-        // ','
-        *(head++) = ',';
-        // num
-        long int ai = ps2->c[i];
-        if (ai < 0)
-            length = PrintNum(head, -ai, 10, 1, width, ladjust, padc, 0);
-        else
-            length = PrintNum(head, ai, 10, 0, width, ladjust, padc, 0);
-        head += length;
-    }
-    // '}'
-    *(head++) = '}';
-
-    return head - buf;
-}
-    
+ 
     
 int
 PrintChar(char * buf, char c, int length, int ladjust)
