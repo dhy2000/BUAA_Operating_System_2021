@@ -522,3 +522,19 @@ int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
     return 0;
 }
 
+int sys_get_page_ref(int sysno, u_int va) {
+
+	u_int pte;
+    
+    Pde * vpd = (UVPT+(UVPT>>12)*4);
+    Pte * vpt = (UVPT);
+
+	if (!(vpd[PDX(va)]&PTE_V))
+		return 0;
+	pte = vpt[VPN(va)];
+	if (!(pte&PTE_V))
+		return 0;
+    printf("__^^__ syscall_pageref %08x, PPN=%d, ref=%d \n", (void*)va, PPN(pte), pages[PPN(pte)].pp_ref);
+	return pages[PPN(pte)].pp_ref;
+}
+
