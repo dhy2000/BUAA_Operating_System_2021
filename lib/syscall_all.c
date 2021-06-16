@@ -534,7 +534,7 @@ int sys_get_page_ref(int sysno, u_int va) {
 	pte = vpt[VPN(va)];
 	if (!(pte&PTE_V))
 		return 0;
-    printf("__^^__ syscall_pageref va=%08x, PPN=%d, ref=%d \n", (void*)va, PPN(pte), pages[PPN(pte)].pp_ref);
+    // printf("__^^__ syscall_pageref va=%08x, PPN=%d, ref=%d \n", (void*)va, PPN(pte), pages[PPN(pte)].pp_ref);
 	return pages[PPN(pte)].pp_ref;
 }
 

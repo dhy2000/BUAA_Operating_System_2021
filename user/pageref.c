@@ -11,7 +11,7 @@ static int user_pageref(void *v) {
 	pte = (* vpt)[VPN(v)];
 	if (!(pte&PTE_V))
 		return 0;
-    writef("--^^-- user_pageref va=%08x, PPN=%d, ref=%d \n", (void*)v, PPN(pte), pages[PPN(pte)].pp_ref);
+    // writef("--^^-- user_pageref va=%08x, PPN=%d, ref=%d \n", (void*)v, PPN(pte), pages[PPN(pte)].pp_ref);
 	return pages[PPN(pte)].pp_ref;
 
 }
@@ -41,7 +41,7 @@ pageref(void *v)
     int usr_ref = user_pageref(v);
     int ker_ref = kern_pageref(v);
 
-    writef("__--__ usr pageref of va %08x is %d, ker pageref of va %08x is %d\n", v, usr_ref, v, ker_ref);
+    //writef("__--__ usr pageref of va %08x is %d, ker pageref of va %08x is %d\n", v, usr_ref, v, ker_ref);
 
     return ker_ref;
 }

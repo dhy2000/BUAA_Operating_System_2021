@@ -101,8 +101,8 @@ _pipeisclosed(struct Fd *fd, struct Pipe *p)
 
     } while (runs != env->env_runs);
     
-    writef(">_< _pipeisclosed check: envid=%d, runs=%d, pfd=%d, pfp=%d\n",
-            env->env_id, env->env_runs, pfd, pfp);
+//    writef(">_< _pipeisclosed check: envid=%d, runs=%d, pfd=%d, pfp=%d\n",
+//            env->env_id, env->env_runs, pfd, pfp);
 
     return (pfd == pfp) ? 1 : 0;
 
@@ -142,7 +142,7 @@ piperead(struct Fd *fd, void *vbuf, u_int n, u_int offset)
     // writef("--- piperead ---\n");
     p = (struct Pipe *)fd2data(fd);
 
-    writef("--- piperead: p->p_wpos=%d, p->p_rpos=%d ---\n", p->p_wpos, p->p_rpos);
+    // writef("--- piperead: p->p_wpos=%d, p->p_rpos=%d ---\n", p->p_wpos, p->p_rpos);
     while (p->p_rpos >= p->p_wpos) {
         if (pipeisclosed(fd2num(fd))) 
             return 0;
@@ -163,7 +163,7 @@ piperead(struct Fd *fd, void *vbuf, u_int n, u_int offset)
     for (i = 0; i < n && p->p_rpos < p->p_wpos; i++, p->p_rpos++) {
         rbuf[i] = p->p_buf[p->p_rpos % BY2PIPE];
     }
-    return n;
+    return i;
 
 	// user_panic("piperead not implemented");
 //	return -E_INVAL;
@@ -186,21 +186,21 @@ pipewrite(struct Fd *fd, const void *vbuf, u_int n, u_int offset)
 
     p = (struct Pipe *)fd2data(fd);
     wbuf = (char*)vbuf;
-    writef("--- pipewrite start: %d bytes, p->p_wpos=%d, p->p_rpos=%d ---\n", n, p->p_wpos, p->p_rpos);
+    // writef("--- pipewrite start: %d bytes, p->p_wpos=%d, p->p_rpos=%d ---\n", n, p->p_wpos, p->p_rpos);
     
     for (i = 0; i < n; i++) {
         while (p->p_wpos - p->p_rpos == BY2PIPE) {
-            writef("--- pipewrite blocks where wpos=%d, rpos=%d\n", p->p_wpos, p->p_rpos);
             if (pipeisclosed(fd2num(fd))) {
-                writef("--< pipewrite terminated because pipe closed\n");
+                // writef("--< pipewrite terminated because pipe closed\n");
                 return i;
             }
+            // writef("--- pipewrite blocks where wpos=%d, rpos=%d\n", p->p_wpos, p->p_rpos);
             syscall_yield();
         }
         p->p_buf[p->p_wpos % BY2PIPE] = wbuf[i];
         p->p_wpos++;
     }
-    writef("--< pipewrite done write %d bytes, wpos=%d, rpos=%d\n", n, p->p_wpos, p->p_rpos);
+    // writef("--< pipewrite done write %d bytes, wpos=%d, rpos=%d\n", n, p->p_wpos, p->p_rpos);
     return n;
 
 
