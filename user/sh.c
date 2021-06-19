@@ -182,6 +182,12 @@ runit:
 			writef(" %s", argv[i]);
 		writef("\n");
 	}
+    
+    // support halt
+    if (strcmp(argv[0], "halt") == 0 || strcmp(argv[0], "exit") == 0) {
+        syscall_halt();
+    }
+
 
 	if ((r = spawn(argv[0], argv)) < 0)
 		writef("spawn %s: %e\n", argv[0], r);

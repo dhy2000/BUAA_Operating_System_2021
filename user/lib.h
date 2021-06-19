@@ -69,7 +69,7 @@ int syscall_write_dev(u_int va,u_int dev,u_int offset);
 int syscall_read_dev(u_int va,u_int dev,u_int offset);
 
 int syscall_get_page_ref(u_int va);
-
+void syscall_halt();
 
 // string.c
 int strlen(const char *s);

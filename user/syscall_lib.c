@@ -100,3 +100,7 @@ int syscall_read_dev(u_int va,u_int dev,u_int offset)
 int syscall_get_page_ref(u_int va) {
     return msyscall(SYS_get_page_ref, va, 0, 0, 0, 0);
 }
+
+void syscall_halt() {
+    msyscall(SYS_halt, 0, 0, 0, 0, 0);
+}

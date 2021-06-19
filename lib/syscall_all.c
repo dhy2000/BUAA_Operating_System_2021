@@ -538,3 +538,12 @@ int sys_get_page_ref(int sysno, u_int va) {
 	return pages[PPN(pte)].pp_ref;
 }
 
+
+void sys_halt(int sysno) {
+    printf("\n");
+    printf("::::::::::::::::::::::::::::::\n");
+    printf("::    Goodbye MOS!          ::\n");
+    printf("::::::::::::::::::::::::::::::\n");
+    halt();
+}
+
