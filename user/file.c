@@ -67,6 +67,11 @@ open(const char *path, int mode)
 
 }
 
+int
+create(const char *path, int ftype) {
+    return fsipc_create(path, ftype);
+}
+
 // Overview:
 //	Close a file descriptor
 int

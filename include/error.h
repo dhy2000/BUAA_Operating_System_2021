@@ -20,7 +20,8 @@
 #define E_BAD_PATH	10	// Bad path
 #define E_FILE_EXISTS	11	// File already exists
 #define E_NOT_EXEC	12	// File not a valid executable
+#define E_DIR_NOT_EXISTS 13 // Directory not exists
 
-#define MAXERROR 12
+#define MAXERROR 13
 
 #endif // _ERROR_H_

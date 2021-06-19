@@ -1,6 +1,7 @@
 #include "lib.h"
 #include <fs.h>
 #include <mmu.h>
+#include <error.h>
 
 /* IDE disk number to look on for our file system */
 #define DISKNO		1

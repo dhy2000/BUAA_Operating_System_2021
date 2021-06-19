@@ -3,7 +3,46 @@
 static char *msg = "This is the NEW message of the day!\r\n\r\n";
 static char *diff_msg = "This is a different massage of the day!\r\n\r\n";
 
+void dispRes(int res, const char *event) {
+    if (res == 0) {
+        writef("@@succeed: %s\n", event);
+    } else if (res < 0) {
+        writef("!!failure(%d): %s\n", res, event);
+    } else {
+        writef("--done(%d): %s\n", res, event);
+    }
+}
 
+void testCreate() {
+    int r;
+    r = create("/A", FTYPE_DIR);
+    dispRes(r, "1 - create dir A");
+    r = create("/B", FTYPE_REG);
+    dispRes(r, "2 - create file B");
+    r = create("/A/a", FTYPE_REG);
+    dispRes(r, "3 - create file /A/a");
+    r = create("/B/C", FTYPE_DIR);
+    dispRes(r, "4 - create dir /B/C");
+    r = create("/A", FTYPE_REG);
+    dispRes(r, "5 - re-create file /A");
+    r = open("/A/a", O_RDWR);
+    dispRes(r, "open /A/a");
+    int fd = r;
+    r = write(fd, "hello, new file", 15);
+    dispRes(r, "write to /A/a");
+    r = close(fd);
+    dispRes(r, "close /A/a");
+    r = open("/A/a", O_RDWR);
+    dispRes(r, "reOpen /A/a");
+
+    char buf[512];
+    user_bzero(buf, sizeof(buf));
+    r = read(fd, buf, 15);
+    dispRes(r, "read from file");
+    writef("read content: %s\n", buf);
+
+    writef("test create done\n");
+}
 
 
 void umain()
@@ -68,16 +107,13 @@ void umain()
         }
         writef("file remove: OK\n");
 
-        
+        testCreate(); 
 
         writef("@@@ fstest OKAY! @@@\n");
-        
-        
-        
-        
-        while (1) {
+         
+        /* while (1) {
             //writef("IDLE!");
-        }
+        } */
 }
 
 

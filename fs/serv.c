@@ -121,7 +121,7 @@ serve_open(u_int envid, struct Fsreq_open *rq)
 	if ((r = file_open((char *)path, &f)) < 0) {
         // MyLab6: add support for O_CREAT
         if (( (rq->req_omode) & O_CREAT )) {
-            r = file_create((char *)path, &f);
+            r = file_create((char *)path, &f, FTYPE_REG);
             if (r < 0) {
                 ipc_send(envid, r, 0, 0);
                 return ;
@@ -267,6 +267,19 @@ serve_sync(u_int envid)
 }
 
 void
+serve_create(u_int envid, struct Fsreq_create *rq)
+{
+    char path[MAXPATHLEN];
+    // bzero(path, sizeof(path));
+    strcpy(path, rq->req_path);
+    int ftype = rq->req_ftype;
+    struct File *f;
+    int r;
+    r = file_create(path, &f, ftype);
+    ipc_send(envid, r, 0, 0);
+}
+
+void
 serve(void)
 {
 	u_int req, whom, perm;
@@ -311,6 +324,9 @@ serve(void)
 			case FSREQ_SYNC:
 				serve_sync(whom);
 				break;
+            case FSREQ_CREATE:
+                serve_create(whom, (struct Fsreq_create *)REQVA);
+                break;
 
 			default:
 				writef("Invalid request code %d from %08x\n", whom, req);
@@ -337,6 +353,6 @@ umain(void)
 	fs_test();
     // writef("(FS) hhh3\n");
 	serve();
-    writef("(FS) hhh4\n");
+    // writef("(FS) hhh4\n");
 }
 
