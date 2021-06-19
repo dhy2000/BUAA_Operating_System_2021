@@ -5,6 +5,7 @@ int flag[256];
 void lsdir(char*, char*);
 void ls1(char*, u_int, u_int, char*);
 
+// entrance
 void
 ls(char *path, char *prefix)
 {
@@ -19,6 +20,7 @@ ls(char *path, char *prefix)
 		ls1(0, st.st_isdir, st.st_size, path);
 }
 
+// walk through directory
 void
 lsdir(char *path, char *prefix)
 {
@@ -36,6 +38,7 @@ lsdir(char *path, char *prefix)
 		user_panic("error reading directory %s: %e", path, n);
 }
 
+// output file/directory name
 void
 ls1(char *prefix, u_int isdir, u_int size, char *name)
 {
