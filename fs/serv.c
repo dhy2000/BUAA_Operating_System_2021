@@ -275,8 +275,28 @@ serve_create(u_int envid, struct Fsreq_create *rq)
     int ftype = rq->req_ftype;
     struct File *f;
     int r;
-    r = file_create(path, &f, ftype);
-    ipc_send(envid, r, 0, 0);
+    if ((ftype & MKDIR_P)) {
+        char *p = path;
+        user_assert(*p == '/');
+        p++;
+        while (*p) {
+            while (*p && *p != '/') p++;
+            if (!*p) break;
+            *p = 0; // temporary set
+            r = file_create(path, &f, FTYPE_DIR);
+            if (r < 0 && r != -E_FILE_EXISTS) {
+                ipc_send(envid, r, 0, 0);
+                return ;
+            }
+            *p = '/';
+            p++;
+        }
+        r = file_create(path, &f, ftype);
+        ipc_send(envid, r, 0, 0);
+    } else {
+        r = file_create(path, &f, ftype);
+        ipc_send(envid, r, 0, 0);
+    }
 }
 
 void

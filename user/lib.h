@@ -144,6 +144,9 @@ int	sync(void);
 #define	O_TRUNC		0x0200		/* truncate to zero length */
 #define	O_EXCL		0x0400		/* error if already exists */
 #define O_MKDIR		0x0800		/* create directory, not regular file */
+#define O_APPEND    0x1000      /* write to the end of file */
 
+/* File create modes */
+#define MKDIR_P     0x0100      /* create dir if dir not exist */
 
 #endif

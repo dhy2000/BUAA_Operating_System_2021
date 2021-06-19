@@ -25,20 +25,32 @@ void testCreate() {
     dispRes(r, "4 - create dir /B/C");
     r = create("/A", FTYPE_REG);
     dispRes(r, "5 - re-create file /A");
+    r = create("/dir1/dir11/dir111", FTYPE_DIR | MKDIR_P);
+    dispRes(r, "6 - mkdir -p /dir1/dir11/dir111");
+    r = create("/dir1/dir12/file1", FTYPE_REG | MKDIR_P);
+    dispRes(r, "7 - create file /dir1/dir12/file1");
     r = open("/A/a", O_RDWR);
     dispRes(r, "open /A/a");
     int fd = r;
     r = write(fd, "hello, new file", 15);
     dispRes(r, "write to /A/a");
+    
+    char buf[512];
+    user_bzero(buf, sizeof(buf));
+    
+    seek(fd, 0); 
+    r = read(fd, buf, 15);
+    dispRes(r, "first read from file");
+    writef("read content: %s\n", buf);
+    
+    
     r = close(fd);
     dispRes(r, "close /A/a");
     r = open("/A/a", O_RDWR);
     dispRes(r, "reOpen /A/a");
 
-    char buf[512];
-    user_bzero(buf, sizeof(buf));
     r = read(fd, buf, 15);
-    dispRes(r, "read from file");
+    dispRes(r, "second read from file");
     writef("read content: %s\n", buf);
 
     writef("test create done\n");
