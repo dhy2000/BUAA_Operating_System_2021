@@ -3,6 +3,9 @@
 static char *msg = "This is the NEW message of the day!\r\n\r\n";
 static char *diff_msg = "This is a different massage of the day!\r\n\r\n";
 
+
+
+
 void umain()
 {
         int r;
@@ -19,7 +22,8 @@ void umain()
         if ((n = read(fdnum, buf, 511)) < 0) {
                 user_panic("read /newmotd: %d", r);
         }
-        if (strcmp(buf, diff_msg) != 0) {
+        writef("fstest: read %d bytes: %s\n", n, buf);
+        if (strcmp(buf, msg) != 0) {
                 user_panic("read returned wrong data");
         }
         writef("read is good\n");
@@ -56,15 +60,23 @@ void umain()
                 user_panic("close /newmotd: %d", r);
         }		
         writef("file rewrite is good\n");
-	if((r = remove("/newmotd"))<0){
-		user_panic("remove /newmotd: %d",r);
-	}
-	if((r = open("/newmotd", O_RDONLY))>=0){
-		user_panic("open after remove /newmotd: %d",r);
-	}
-	writef("file remove: OK\n");
+        if((r = remove("/newmotd"))<0){
+            user_panic("remove /newmotd: %d",r);
+        }
+        if((r = open("/newmotd", O_RDONLY))>=0){
+            user_panic("open after remove /newmotd: %d",r);
+        }
+        writef("file remove: OK\n");
+
+        
+
+        writef("@@@ fstest OKAY! @@@\n");
+        
+        
+        
+        
         while (1) {
-                //writef("IDLE!");
+            //writef("IDLE!");
         }
 }
 
