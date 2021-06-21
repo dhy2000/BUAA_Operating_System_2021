@@ -20,7 +20,7 @@ static void user_myoutput(void *arg, char *s, int l)
     }
 }
 
-char *strptr = NULL;
+char *strptr;
 
 static void user_mywrite2str(void *arg, char *s, int l) {
     int i;
@@ -35,6 +35,8 @@ static void user_mywrite2str(void *arg, char *s, int l) {
     }
 }
 
+
+
 void writef(char *fmt, ...)
 {
     va_list ap;
@@ -46,11 +48,12 @@ void writef(char *fmt, ...)
 // user_sprintf
 void swritef(char *s, char *fmt, ...)
 {
+    // static char *strptr;
     strptr = s;
     va_list ap;
     va_start(ap, fmt);
     user_lp_Print(user_mywrite2str, 0, fmt, ap);
-    va_end(ap);
+    va_end(ap); 
 }
 
 void
