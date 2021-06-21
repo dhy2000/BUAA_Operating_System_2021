@@ -37,6 +37,7 @@ all: echo.x echo.b  \
 	init.b sh.b cat.b ls.b \
 	fstest.x fstest.b \
 	testcursor.x testcursor.b \
+	testinput.x testinput.b \
 	$(USERLIB) entry.o syscall_wrap.o
 
 %.x: %.b.c 

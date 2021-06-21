@@ -278,6 +278,41 @@ seek(int fdnum, u_int offset)
 	return 0;
 }
 
+int
+lseek(int fdnum, u_int offset, int where) {
+    int r;
+    struct Fd *fd;
+    
+    if ((r = fd_lookup(fdnum, &fd)) < 0) {
+        return -1; // failed!
+    }
+    
+    // need to know the size of file
+    int fsize, fpeof;
+    struct Filefd *ffd = (struct Filefd *)fd;
+    fsize = ffd->f_file.f_size;
+    fpeof = fsize - 1; // not sure
+
+    int off = fd->fd_offset;
+
+    switch (where) {
+        case LSEEK_SET:
+            off = 0 + offset;
+            break;
+        case LSEEK_CUR:
+            off = off + offset;
+            break;
+        case LSEEK_END:
+            off = fpeof - offset;
+            break;
+        default:;
+    }
+    if (off > fpeof) off = fpeof;
+    if (off < 0) off = 0;
+    fd->fd_offset = off;
+
+    return fd->fd_offset;
+}
 
 int fstat(int fdnum, struct Stat *stat)
 {

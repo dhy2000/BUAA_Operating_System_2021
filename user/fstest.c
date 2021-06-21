@@ -56,6 +56,32 @@ void testCreate() {
     writef("test create done\n");
 }
 
+void testlseek() {
+    writef("@@@ test lseek\n");
+    int r;
+    r = create("/file11", FTYPE_REG);
+    dispRes(r, "create an empty file");
+    r = open("/file11", O_RDWR);
+    if (r < 0) {
+        writef("Failed to open file\n");
+        return;
+    }
+    int fd = r;
+    char *msg1 = "Hello, world";
+    r = write(fd, msg1, 13);
+    lseek(fd, 0, LSEEK_SET);
+    char buf[128];
+    r = read(fd, buf, 13);
+    buf[13] = 0;
+    r = strcmp(msg1, buf);
+    dispRes(r, "Test read after write, lseek(SEEK_SET)");
+    lseek(fd, 2, LSEEK_CUR);
+    r = read(fd, buf, 1);
+    r = !(buf[0] == 'l');
+    dispRes(r, "Test lseek(off, SEEK_CUR)");
+
+
+}
 
 void umain()
 {

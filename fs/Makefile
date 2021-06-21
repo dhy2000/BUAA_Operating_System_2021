@@ -32,6 +32,7 @@ USERAPPS :=  $(user_dir)/num.b  \
 			 $(user_dir)/cat.b \
 			 $(user_dir)/fstest.b \
 			 $(user_dir)/testcursor.b \
+			 $(user_dir)/testinput.b \
 		 $(user_dir)/testptelibrary.b
 
 

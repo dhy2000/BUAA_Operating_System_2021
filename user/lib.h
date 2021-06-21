@@ -119,6 +119,7 @@ int	close(int fd);
 int	read(int fd, void *buf, u_int nbytes);
 int	write(int fd, const void *buf, u_int nbytes);
 int	seek(int fd, u_int offset);
+int lseek(int fd, u_int offset, int where); // added
 void	close_all(void);
 int	readn(int fd, void *buf, u_int nbytes);
 int	dup(int oldfd, int newfd);
@@ -150,5 +151,11 @@ int	sync(void);
 
 /* File create modes */
 #define MKDIR_P     0x0100      /* create dir if dir not exist */
+
+/* File lseek marks */
+#define LSEEK_SET   0
+#define LSEEK_CUR   1
+#define LSEEK_END   2
+
 
 #endif
