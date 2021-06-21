@@ -22,13 +22,20 @@ USERLIB := printf.o \
 		wait.o \
 		spawn.o \
 		console.o \
-		fprintf.o \
-		cursor.o
+		fprintf.o
 
 CFLAGS += -nostdlib -static
 
 
-all: echo.x echo.b  num.x num.b testptelibrary.b testptelibrary.x fktest.x fktest.b pingpong.x pingpong.b idle.x testarg.b testpipe.x testpiperace.x icode.x init.b sh.b cat.b ls.b fstest.x fstest.b testcursor.x testcursor.b $(USERLIB) entry.o syscall_wrap.o
+all: echo.x echo.b  \
+	num.x num.b \
+	testptelibrary.b testptelibrary.x \
+	fktest.x fktest.b \
+	pingpong.x pingpong.b\
+	idle.x testarg.b testpipe.x testpiperace.x icode.x \
+	init.b sh.b cat.b ls.b \
+	fstest.x fstest.b \
+	$(USERLIB) entry.o syscall_wrap.o
 
 %.x: %.b.c 
 	echo cc1 $< 

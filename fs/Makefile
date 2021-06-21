@@ -18,8 +18,7 @@ USERLIB :=  $(user_dir)/printf.o \
 		$(user_dir)/spawn.o \
 		$(user_dir)/pipe.o \
 		$(user_dir)/console.o \
-		$(user_dir)/fprintf.o \
-		$(user_dir)/cursor.o
+		$(user_dir)/fprintf.o
 
 FSLIB :=	fs.o \
 		ide.o \
@@ -31,7 +30,6 @@ USERAPPS :=  $(user_dir)/num.b  \
 			 $(user_dir)/sh.b  \
 			 $(user_dir)/cat.b \
 			 $(user_dir)/fstest.b \
-			 $(user_dir)/testcursor.b \
 		 $(user_dir)/testptelibrary.b
 
 
