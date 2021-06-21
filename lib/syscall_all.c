@@ -541,9 +541,13 @@ int sys_get_page_ref(int sysno, u_int va) {
 
 void sys_halt(int sysno) {
     printf("\n");
-    printf("::::::::::::::::::::::::::::::\n");
-    printf("::    Goodbye MOS!          ::\n");
-    printf("::::::::::::::::::::::::::::::\n");
+
+    printf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+    printf("::                                                         ::\n");
+    printf("::                  Goodbye MOS!                           ::\n");
+    printf("::               ^^^^^^TOO LOW^^^^^^^^^                    ::\n");
+    printf("::                                                         ::\n");
+    printf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
     halt();
 }
 
