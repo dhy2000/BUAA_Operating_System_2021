@@ -271,7 +271,7 @@ read_super(void)
 {
 	int r;
 	void *blk;
-    writef("fs: enter read_super\n");
+    writef("fs: > read_super\n");
 	// Step 1: read super block.
 	if ((r = read_block(1, &blk, 0)) < 0) {
 		user_panic("cannot read superblock: %e", r);
@@ -367,6 +367,7 @@ check_write_block(void)
 void
 fs_init(void)
 {
+    writef("@@@ in fs_init: &super = 0x%08x, super = 0x%08x\n", &super, super);
 	read_super();
 	check_write_block();
 	read_bitmap();
