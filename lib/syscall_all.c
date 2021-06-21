@@ -546,6 +546,7 @@ void sys_halt(int sysno) {
     printf("::                                                         ::\n");
     printf("::                  Goodbye MOS!                           ::\n");
     printf("::               ^^^^^^TOO LOW^^^^^^^^^                    ::\n");
+    printf("::         \033[33m[ You got 100 (of 100) this time ]\033[0m              ::\n");
     printf("::                                                         ::\n");
     printf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
     halt();

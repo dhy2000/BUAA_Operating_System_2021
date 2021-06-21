@@ -176,12 +176,12 @@ runit:
 		return;
 	}
 	argv[argc] = 0;
-	if (1) {
+	/* if (1) {
 		// writef("[%08x] SPAWN:", env->env_id);
 		for (i=0; argv[i]; i++)
 			writef(" %s", argv[i]);
 		writef("\n");
-	}
+	} */
     
     // support halt
     if (strcmp(argv[0], "halt") == 0 || strcmp(argv[0], "exit") == 0) {
@@ -190,7 +190,7 @@ runit:
 
 
 	if ((r = spawn(argv[0], argv)) < 0)
-		writef("spawn %s: %e\n", argv[0], r);
+		writef("error spawn %s: %e\n", argv[0], r);
     // user_panic("@@@@\n");
 	close_all();
 	if (r >= 0) {
