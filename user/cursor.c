@@ -154,5 +154,7 @@ void cur_color(int front, int back) {
 
 void cur_color_restore() {
     // cur_color(COLOR_FRONT_WHITE, COLOR_BACK_BLACK);
-    mywritestr("\033[0m");
+    // mywritestr("\033[H");
+    char tmp[32] = "\033[0m";
+    mywritestr(tmp);
 }

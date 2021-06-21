@@ -64,6 +64,19 @@ void user_bzero(void *v, u_int n)
 		*p++ = 0;
 	}
 }
+
+void memset(void *dst, u_int val, u_int n) {
+    char *p;
+    int m;
+    char v;
+    
+    p = dst;
+    m = n;
+    v = val;
+    while (--m >= 0) {
+        *p++ = v;
+    }
+}
 /*--------------------------------------------------------------*/
 
 /* Overview:
