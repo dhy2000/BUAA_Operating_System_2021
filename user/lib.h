@@ -26,6 +26,7 @@ void user_lp_Print(void (*output)(void *, const char *, int),
 				   va_list ap);
 
 void writef(char *fmt, ...);
+void swritef(char *s, char *fmt, ...);
 
 void _user_panic(const char *, int, const char *, ...)
 __attribute__((noreturn));

@@ -15,8 +15,23 @@ static void user_myoutput(void *arg, char *s, int l)
     if ((l==1) && (s[0] == '\0')) return;
     
     for (i=0; i< l; i++) {
-	syscall_putchar(s[i]);
-	if (s[i] == '\n') syscall_putchar('\n');
+        syscall_putchar(s[i]);
+        // if (s[i] == '\n') syscall_putchar('\n');
+    }
+}
+
+char *strptr = NULL;
+
+static void user_mywrite2str(void *arg, char *s, int l) {
+    int i;
+
+    // special termination call
+    if ((l == 1) && (s[0] == '\0')) return;
+    for (i = 0; i < l; i++) {
+        if (strptr) { 
+            *strptr = s[i];
+            strptr++;
+        }
     }
 }
 
@@ -25,6 +40,16 @@ void writef(char *fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     user_lp_Print(user_myoutput, 0, fmt, ap);
+    va_end(ap);
+}
+
+// user_sprintf
+void swritef(char *s, char *fmt, ...)
+{
+    strptr = s;
+    va_list ap;
+    va_start(ap, fmt);
+    user_lp_Print(user_mywrite2str, 0, fmt, ap);
     va_end(ap);
 }
 
