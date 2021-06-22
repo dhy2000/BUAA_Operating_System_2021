@@ -67,7 +67,7 @@ write(1,"LALA",4);
 
 	for (;;) {
 		writef("init: starting sh\n");
-		r = spawnl("sh.b", "sh", (char*)0);
+		r = spawnl("extsh.b", "extsh", (char*)0);
 		if (r < 0) {
 			writef("init: spawn sh: %e\n", r);
 			continue;
