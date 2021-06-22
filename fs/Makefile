@@ -33,6 +33,7 @@ USERAPPS :=  $(user_dir)/num.b  \
 			 $(user_dir)/fstest.b \
 			 $(user_dir)/testcursor.b \
 			 $(user_dir)/testinput.b \
+			 $(user_dir)/extsh.b \
 		 $(user_dir)/testptelibrary.b
 
 
