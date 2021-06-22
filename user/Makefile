@@ -39,11 +39,11 @@ all: echo.x echo.b  \
 	testcursor.x testcursor.b \
 	testinput.x testinput.b \
 	extsh.x extsh.b \
-	slow.x slow.b \
-	touch.x touch.b \
-	mkdir.x mkdir.b \
-	tree.x tree.b \
-	history.x history.b \
+	slow.b \
+	touch.b \
+	mkdir.b \
+	tree.b \
+	history.b \
 	$(USERLIB) entry.o syscall_wrap.o
 
 %.x: %.b.c 
