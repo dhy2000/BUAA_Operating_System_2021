@@ -20,7 +20,15 @@ static void user_myoutput(void *arg, char *s, int l)
     }
 }
 
-char *strptr;
+char *strptr; // good
+// char *hhh = NULL; // bad
+// char hack[64] = "^^^^^^TOO LOW^^^^^^^^^"; // good, need memset
+// char *fuck = "panic at OS:lab6:^^^^^^TOO LOW^^^^^^^^^"; // good
+
+// int g1 = 0; // bad
+// int g2; // good
+// int garr1[12] = {1, 2, 3}; // good
+// int garr2[20]; // bad
 
 static void user_mywrite2str(void *arg, char *s, int l) {
     int i;
