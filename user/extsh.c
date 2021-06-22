@@ -50,8 +50,7 @@ static void reprint() {
         cnt++; 
         mputc(input_buf[i]);
     }
-    cur_move(cnt, CUR_MOVE_LEFT);// */
-
+    cur_move(cnt, CUR_MOVE_LEFT);
 }
 
 inline static void clearbuffer() {
@@ -372,7 +371,6 @@ gettoken(char *s, char **p1)
 
 int
 runinnercmd(const char *ss) {
-
     char s[INPUT_MAX_LEN]; // copy command
     strcpy(s, ss);
     char *argv[MAXARGS], *t;
@@ -385,13 +383,11 @@ runinnercmd(const char *ss) {
         c = gettoken(0, &t);
         switch(c){
         case 0:
-            // goto runit;
             done = 1;
             break;
         case 'w':
             if(argc == MAXARGS){
                 writef("too many arguments\n");
-                // exit();
                 return 1;
             }
             argv[argc++] = t;
@@ -514,6 +510,13 @@ again:
                 goto runit;
             }
 
+            break;
+        case ';':
+            if ((r = fork()) == 0) {
+                goto again;
+            } else {
+                goto runit;
+            }
             break;
         }
     }
