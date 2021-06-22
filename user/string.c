@@ -56,3 +56,15 @@ strcmp(const char *p, const char *q)
 	return 0;
 }
 
+int strncmp(const char *p, const char *q, u_int len) {
+    int i = 0;
+    for (; i < len && p[i] && q[i] && p[i] == q[i]; i++);
+    char pp = p[i], qq = q[i];
+    if (i == len) 
+        pp = 0, qq = 0;
+    if ((u_int)(pp) < (u_int)(qq)) 
+        return -1;
+    if ((u_int)(pp) > (u_int)(qq))
+        return 1;
+    return 0;
+}

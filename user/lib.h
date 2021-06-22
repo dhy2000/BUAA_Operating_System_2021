@@ -79,6 +79,7 @@ char *strcpy(char *dst, const char *src);
 const char *strchr(const char *s, char c); 
 void *memcpy(void *destaddr, void const *srcaddr, u_int len);
 int strcmp(const char *p, const char *q);
+int strncmp(const char *p, const char *q, u_int len);
 // ipc.c
 void	ipc_send(u_int whom, u_int val, u_int srcva, u_int perm);
 u_int	ipc_recv(u_int *whom, u_int dstva, u_int *perm);
