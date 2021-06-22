@@ -1,4 +1,5 @@
 #include "lib.h"
+#include "cursor.h"
 
 int flag[256];
 
@@ -53,7 +54,12 @@ ls1(char *prefix, u_int isdir, u_int size, char *name)
 			sep = "";
 		fwritef(1, "%s%s", prefix, sep);
 	}
+    if (isdir) 
+        cur_color_front(COLOR_FRONT_BLUE);
+    else
+        cur_color_front(COLOR_FRONT_WHITE);
 	fwritef(1, "%s", name);
+    cur_color_restore();
 	if(flag['F'] && isdir)
 		fwritef(1, "/");
 	fwritef(1, " ");
