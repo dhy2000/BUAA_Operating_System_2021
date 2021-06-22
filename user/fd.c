@@ -284,6 +284,7 @@ lseek(int fdnum, u_int offset, int where) {
     struct Fd *fd;
     
     if ((r = fd_lookup(fdnum, &fd)) < 0) {
+        // writef("### lseek failed\n");
         return -1; // failed!
     }
     
@@ -291,7 +292,7 @@ lseek(int fdnum, u_int offset, int where) {
     int fsize, fpeof;
     struct Filefd *ffd = (struct Filefd *)fd;
     fsize = ffd->f_file.f_size;
-    fpeof = fsize - 1; // not sure
+    fpeof = fsize; // not sure
 
     int off = fd->fd_offset;
 
@@ -303,12 +304,13 @@ lseek(int fdnum, u_int offset, int where) {
             off = off + offset;
             break;
         case LSEEK_END:
-            off = fpeof - offset;
+            off = fpeof + offset;
             break;
         default:;
     }
     if (off > fpeof) off = fpeof;
     if (off < 0) off = 0;
+    // writef("### lseek(%d) old_off=%d, new_off=%d\n", fdnum, fd->fd_offset, off);
     fd->fd_offset = off;
 
     return fd->fd_offset;

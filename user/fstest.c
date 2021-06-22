@@ -73,14 +73,27 @@ void testlseek() {
     char buf[128];
     r = read(fd, buf, 13);
     buf[13] = 0;
+    writef("1 - Read: %s\n", buf);
     r = strcmp(msg1, buf);
     dispRes(r, "Test read after write, lseek(SEEK_SET)");
+    lseek(fd, 0, LSEEK_SET);
     lseek(fd, 2, LSEEK_CUR);
     r = read(fd, buf, 1);
+    writef("2 - Read: %c@[%d]\n", buf[0], (int)buf[0]);
     r = !(buf[0] == 'l');
     dispRes(r, "Test lseek(off, SEEK_CUR)");
+    lseek(fd, 0, LSEEK_END);
+    char *msg2 = "123";
+    r = write(fd, msg2, 3);
+    lseek(fd, -3, LSEEK_END);
+    r = read(fd, buf, 3);
+    buf[4] = 0;
+    writef("3 - Read: %s\n", buf);
+    r = strcmp(buf, msg2);
+    dispRes(r, "Test lseek(SEEK_END)");
 
 
+    writef("test lseek done\n");
 }
 
 void umain()
@@ -146,7 +159,8 @@ void umain()
         writef("file remove: OK\n");
 
         testCreate(); 
-
+        
+        testlseek();
         writef("@@@ fstest OKAY! @@@\n");
          
         /* while (1) {
