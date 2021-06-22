@@ -311,7 +311,18 @@ int echocmds = 0;
 // eventually (once we parse the space where the nul will go),
 // words get nul-terminated.
 #define WHITESPACE " \t\r\n"
-#define SYMBOLS "<|>&;()"
+#define SYMBOLS "<|>&;()\""
+
+static char* extractQuote(char *dst, const char *src) {
+    // src: the first character **after** the beginning \"
+    // returns: the position of the **ending** \", or the end of string
+    char *s = src, *t = dst;
+    while (*s && *s != '\"') {
+        if (t) { *t = *s; }
+        s++; 
+    }
+    return s;
+}
 
 static int
 _gettoken(char *s, char **p1, char **p2)
@@ -335,16 +346,31 @@ _gettoken(char *s, char **p1, char **p2)
         return 0;
     }
     if(strchr(SYMBOLS, *s)){
-        t = *s;
-        *p1 = s;
-        *s++ = 0;
-        *p2 = s;
-//        if (debug_ > 1) writef("TOK %c\n", t);
-        return t;
+        if (*s == '\"') {
+            s++;
+            *p1 = s;
+            s = extractQuote(NULL, s);
+            if (*s == 0) 
+                writef("@@@ Quotation not end, unexpected EOL\n");
+            *s = 0;
+            s++;
+            *p2 = s;
+            return 'w';
+        }
+        else {
+            t = *s;
+            *p1 = s;
+            *s++ = 0;
+            *p2 = s;
+//            if (debug_ > 1) writef("TOK %c\n", t);
+            return t;
+        }
     }
+    // word
     *p1 = s;
-    while(*s && !strchr(WHITESPACE SYMBOLS, *s))
+    while(*s && !strchr(WHITESPACE SYMBOLS, *s)) {
         s++;
+    }
     *p2 = s;
     if (debug_ > 1) {
         t = **p2;
