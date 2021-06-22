@@ -61,7 +61,8 @@ void swritef(char *s, char *fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     user_lp_Print(user_mywrite2str, 0, fmt, ap);
-    va_end(ap); 
+    va_end(ap);
+    *strptr = 0; // Terminate the string
 }
 
 void
