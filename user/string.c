@@ -23,6 +23,16 @@ strcpy(char *dst, const char *src)
 	return ret;
 }
 
+char*
+strcat(char *dst, const char *src)
+{
+    char *ret = dst;
+    while (*dst != '\0') dst++;
+    while ((*dst = *src) != 0) 
+        dst++, src++;
+    return ret;
+}
+
 const char*
 strchr(const char *s, char c)
 {
