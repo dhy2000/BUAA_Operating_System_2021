@@ -236,6 +236,7 @@ void inputenter() {
                 wait(r);
             }
         }
+        // runcmd(input_buf);
     }
     clearbuffer();
     writef("\n");
@@ -361,7 +362,7 @@ gettoken(char *s, char **p1)
         return 0;
     }
     c = nc;
-    *p1 = np1;
+    if (p1) *p1 = np1;
     nc = _gettoken(np2, &np1, &np2);
     return c;
 }
