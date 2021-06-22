@@ -266,8 +266,28 @@ void mainloop() {
     }
 }
 
+/* ^^^^^^ Part 5. Inner commands ^^^^^^^^^ */
+static void cmd_clear(int argc, char **argv) {
+    cur_clear();
+}
 
-/* ^^^^^^ Part 5. Parser for shell ^^^^^^^^^ */
+static void cmd_halt(int argc, char **argv) {
+    syscall_halt();
+}
+
+typedef struct {
+    char *cmd;
+    void (*run)(int , char **);
+} InnerCommand;
+
+InnerCommand inner_cmd[] = {
+    {"clear", cmd_clear}, 
+    {"exit", cmd_halt}, 
+    {"quit", cmd_halt},
+    {"halt", cmd_halt} 
+};
+
+/* ^^^^^^ Part 6. Parser for shell ^^^^^^^^^ */
 
 int debug_ = 0;
 int interactive = '?';
@@ -444,18 +464,28 @@ runit:
     }
     argv[argc] = 0;
     
-    // support halt
-    if (strcmp(argv[0], "halt") == 0 || strcmp(argv[0], "exit") == 0) {
-        syscall_halt();
+    // support inner commands
+    InnerCommand *innercommand = 0;
+    int inner_tot = ARRAY_SIZE(inner_cmd);
+    for (i = 0; i < inner_tot; i++) {
+        innercommand = &inner_cmd[i];
+        if (strcmp(argv[0], innercommand->cmd) == 0) {
+            break;
+        }
+        innercommand = 0;
     }
 
-
-    if ((r = spawn(argv[0], argv)) < 0)
-        writef("error spawn %s: %e\n", argv[0], r);
-    close_all();
-    if (r >= 0) {
-        if (debug_) writef("[%08x] WAIT %s %08x\n", env->env_id, argv[0], r);
-        wait(r);
+    if (innercommand != 0) {
+        if (innercommand->run != 0)
+            (innercommand->run)(argc, argv);
+    } else {
+        if ((r = spawn(argv[0], argv)) < 0)
+            writef("error spawn %s: %e\n", argv[0], r);
+        close_all();
+        if (r >= 0) {
+            if (debug_) writef("[%08x] WAIT %s %08x\n", env->env_id, argv[0], r);
+            wait(r);
+        }
     }
     if (rightpipe) {
         if (debug_) writef("[%08x] WAIT right-pipe %08x\n", env->env_id, rightpipe);
