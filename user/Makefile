@@ -40,6 +40,10 @@ all: echo.x echo.b  \
 	testinput.x testinput.b \
 	extsh.x extsh.b \
 	slow.x slow.b \
+	touch.x touch.b \
+	mkdir.x mkdir.b \
+	tree.x tree.b \
+	history.x history.b \
 	$(USERLIB) entry.o syscall_wrap.o
 
 %.x: %.b.c 
