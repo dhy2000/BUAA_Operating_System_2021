@@ -29,7 +29,6 @@ inline static void printhead() {
 
 /* Input Buffers */
 #define INPUT_MAX_LEN 512
-// #define SPECIAL_MAX_LEN 16
 char input_buf[INPUT_MAX_LEN];
 int input_size, cursor_pos; // do not use u_int;
 //@ public invariant cursor_pos <= input_size;
@@ -208,7 +207,8 @@ static void special_key_detect() {
 
 /* ^^^^^^ Part 4. Top Interfaces ^^^^^^^^^ */
 
-static void runcmd(char *s); // declaration
+static void runcmd(const char *s); // declaration
+static int runinnercmd(const char *s); // for run inner command
 
 /*
  * Overview: callback method when finished entering a command.
@@ -218,22 +218,23 @@ static void runcmd(char *s); // declaration
 void inputenter() {
     if (input_size > 0) {
         input_buf[input_size] = 0;
-        /* writef("@@@ command:\"%s\"\n", input_buf);
-        if (strcmp(input_buf, "exit") == 0) {
-            exit();
-        } */
         int r;
-        if ((r = fork()) < 0) 
-            writef("@@ error on fork!\n");
-        else {
-            if (r == 0) { // child
-                runcmd(input_buf);
-                exit();
-                return;
-            } else {
-                // father
-                // TODO: support background command (not wait)
-                wait(r);
+        
+        // inner command first
+        r = runinnercmd(input_buf);
+        if (r == 0) { // not inner command 
+            if ((r = fork()) < 0) 
+                writef("@@ error on fork!\n");
+            else {
+                if (r == 0) { // child
+                    runcmd(input_buf);
+                    exit();
+                    return;
+                } else {
+                    // father
+                    // TODO: support background command (not wait)
+                    wait(r);
+                }
             }
         }
         // runcmd(input_buf);
@@ -368,9 +369,70 @@ gettoken(char *s, char **p1)
 }
 
 #define MAXARGS 16
+
+int
+runinnercmd(const char *ss) {
+
+    char s[INPUT_MAX_LEN]; // copy command
+    strcpy(s, ss);
+    char *argv[MAXARGS], *t;
+    int argc, c, i, r;
+    int fdnum;
+    gettoken(s, 0);
+    argc = 0;
+    for(;;){
+        int done = 0;
+        c = gettoken(0, &t);
+        switch(c){
+        case 0:
+            // goto runit;
+            done = 1;
+            break;
+        case 'w':
+            if(argc == MAXARGS){
+                writef("too many arguments\n");
+                // exit();
+                return 1;
+            }
+            argv[argc++] = t;
+            break;
+        default:
+            done = 1;
+            break;
+        }
+        if (done) break;
+    }
+
+    if(argc == 0) {
+        if (debug_) writef("EMPTY COMMAND\n");
+        return 1;
+    }
+    argv[argc] = 0;
+    
+    // support inner commands
+    InnerCommand *innercommand = 0;
+    int inner_tot = ARRAY_SIZE(inner_cmd);
+    for (i = 0; i < inner_tot; i++) {
+        innercommand = &inner_cmd[i];
+        if (strcmp(argv[0], innercommand->cmd) == 0) {
+            break;
+        }
+        innercommand = 0;
+    }
+
+    if (innercommand != 0) {
+        if (innercommand->run != 0)
+            (innercommand->run)(argc, argv);
+        return 1;
+    }
+    return 0;
+}
+
 void
-runcmd(char *s)
+runcmd(const char *ss)
 {
+    char s[INPUT_MAX_LEN]; // copy command
+    strcpy(s, ss);
     char *argv[MAXARGS], *t;
     int argc, c, i, r, p[2], fd, rightpipe;
     int fdnum;
@@ -396,7 +458,6 @@ again:
                 exit();
             }
             // Your code here -- open t for reading,
-            // writef("@@@ shell: will open %s for read\n", t);
             r = open(t, O_RDONLY);
             if (r < 0) { user_panic("sh.c failed to open file"); }
             fd = r;
@@ -413,7 +474,6 @@ again:
                 writef("syntax error: < not followed by word\n");
                 exit();
             }
-            // writef("@@@ shell: will open %s for write\n", t);
             r = open(t, O_WRONLY | O_CREAT);
             if (r < 0) {user_panic("sh.c failed to open file");}
             fd = r;
@@ -465,28 +525,12 @@ runit:
     }
     argv[argc] = 0;
     
-    // support inner commands
-    InnerCommand *innercommand = 0;
-    int inner_tot = ARRAY_SIZE(inner_cmd);
-    for (i = 0; i < inner_tot; i++) {
-        innercommand = &inner_cmd[i];
-        if (strcmp(argv[0], innercommand->cmd) == 0) {
-            break;
-        }
-        innercommand = 0;
-    }
-
-    if (innercommand != 0) {
-        if (innercommand->run != 0)
-            (innercommand->run)(argc, argv);
-    } else {
-        if ((r = spawn(argv[0], argv)) < 0)
-            writef("error spawn %s: %e\n", argv[0], r);
-        close_all();
-        if (r >= 0) {
-            if (debug_) writef("[%08x] WAIT %s %08x\n", env->env_id, argv[0], r);
-            wait(r);
-        }
+    if ((r = spawn(argv[0], argv)) < 0)
+        writef("error spawn %s: %e\n", argv[0], r);
+    close_all();
+    if (r >= 0) {
+        if (debug_) writef("[%08x] WAIT %s %08x\n", env->env_id, argv[0], r);
+        wait(r);
     }
     if (rightpipe) {
         if (debug_) writef("[%08x] WAIT right-pipe %08x\n", env->env_id, rightpipe);
