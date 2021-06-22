@@ -104,3 +104,7 @@ int syscall_get_page_ref(u_int va) {
 void syscall_halt() {
     msyscall(SYS_halt, 0, 0, 0, 0, 0);
 }
+
+int syscall_noblock_getc() {
+    return msyscall(SYS_noblock_getc, 0, 0, 0, 0, 0);
+}

@@ -11,4 +11,11 @@ LEAF(sys_cgetc)
 	move	v0,t0
 	jr	ra
 	nop
-END(sys_cgetc) 
+END(sys_cgetc)
+
+LEAF(sys_noblock_getc)
+    lb t0, 0x90000000
+    move v0,t0
+    jr ra
+    nop
+END(sys_noblock_getc)

@@ -252,7 +252,11 @@ void inputenter() {
 void mainloop() {
     char ch;
     while (1) {
-        ch = syscall_cgetc();
+        ch = syscall_noblock_getc();
+        if (ch == 0) {
+            syscall_yield(); 
+            continue;
+        }
         if (ch == '\r' || ch == '\n') {
             syscall_putchar('\n');
             inputenter();
@@ -432,6 +436,7 @@ runcmd(const char *ss)
     char *argv[MAXARGS], *t;
     int argc, c, i, r, p[2], fd, rightpipe;
     int fdnum;
+    int isbackground = 0;
     rightpipe = 0;
     gettoken(s, 0);
 again:
@@ -518,6 +523,9 @@ again:
                 goto runit;
             }
             break;
+        case '&':
+            isbackground = 1;
+            break;
         }
     }
 
@@ -533,7 +541,8 @@ runit:
     close_all();
     if (r >= 0) {
         if (debug_) writef("[%08x] WAIT %s %08x\n", env->env_id, argv[0], r);
-        wait(r);
+        if (!isbackground)
+            wait(r);
     }
     if (rightpipe) {
         if (debug_) writef("[%08x] WAIT right-pipe %08x\n", env->env_id, rightpipe);
