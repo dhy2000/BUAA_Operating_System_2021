@@ -277,7 +277,8 @@ serve_create(u_int envid, struct Fsreq_create *rq)
     int r;
     if ((ftype & MKDIR_P)) {
         char *p = path;
-        user_assert(*p == '/');
+        // user_assert(*p == '/');
+        if (*p == '/') p++;
         p++;
         while (*p) {
             while (*p && *p != '/') p++;
