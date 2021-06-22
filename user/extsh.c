@@ -1,6 +1,30 @@
 #include "lib.h"
 #include "cursor.h"
 
+#define ARRAY_SIZE(arr) (sizeof((arr)) / sizeof((arr)[0]))
+/* ^^^^^^ My Extended Super Shell ^^^^^^^^^ */
+
+/* ^^^^^^ Part 1. Constant Text Messages ^^^^^^^^^ */
+inline static void printWelcome() {
+    writef("\n");
+    writef(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+    writef("::                                                         ::\n");
+    writef("::              \033[31mExtended Shell\033[0m  \033[33mV 2021.6\033[0m                   ::\n");
+    writef("::                                                         ::\n");
+    writef(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+}
+
+inline static void printhead() {
+    cur_color_front(COLOR_FRONT_WHITE);
+    writef("mos ");
+    cur_color_front(COLOR_FRONT_BLUE);
+    writef("$");
+    cur_color_restore();
+    writef(" ");
+}
+
+
+/* ^^^^^^ Part 2. Text Inputs ^^^^^^^^^ */
 
 /* Input Buffers */
 #define INPUT_MAX_LEN 512
@@ -11,12 +35,20 @@ int input_size, cursor_pos; // do not use u_int;
 //@ public invariant input_buf[input_size] == 0;
 //@ public invariant input_size < INPUT_MAX_LEN
 
+inline static void mputc(char ch) {
+    if (ch >= 32 && ch <= 126)
+        syscall_putchar(ch);
+    else
+        syscall_putchar('\?');
+}
+
+
 static void reprint() {
     cur_clear_lright();
     int i, cnt = 0;
     for (i = cursor_pos; i < input_size; i++) {
-        cnt++;
-        syscall_putchar(input_buf[i]);
+        cnt++; 
+        mputc(input_buf[i]);
     }
     cur_move(cnt, CUR_MOVE_LEFT);// */
 
@@ -76,6 +108,9 @@ static void text_cur_move(int steps) {
 
 }
 
+/* ^^^^^^ Part 3. Special Keys ^^^^^^^^^ */
+
+
 /* Special Key Sequence */
 // #define SPECIAL_KEY_ESCAPE 0
 #define SPECIAL_KEY_BACKSPACE 1
@@ -96,24 +131,99 @@ SpecialKey *spec_key[] = {
     (SpecialKey*)(special_key_data + 6), // DOWN
     (SpecialKey*)(special_key_data + 10), // LEFT
     (SpecialKey*)(special_key_data + 14), // RIGHT
-    (SpecialKey*)(special_key_data + 17) // DELETE
+    (SpecialKey*)(special_key_data + 18) // DELETE
 };
 
+static void key_event_backspace();
+static void key_event_delete();
+static void key_event_up();
+static void key_event_down();
+static void key_event_left();
+static void key_event_right();
 
+void (*key_event[])(void) = {0, key_event_backspace, key_event_up, key_event_down, key_event_left, key_event_right, key_event_delete};
+
+
+void key_event_backspace() {
+    // writef("@@backspace@@");
+    text_cur_move(-1);
+    deleteChar();
+}
+
+void key_event_delete() {
+    // writef("@@delete@@");
+    deleteChar();
+}
+
+void key_event_up() {
+    // TODO: not implemented yet
+}
+
+void key_event_down() {
+    // TODO: not implemented yet
+}
+
+void key_event_left() {
+    text_cur_move(-1);
+}
+
+void key_event_right() {
+    text_cur_move(1);
+}
+
+/* Overview: detect whether there is special key sequence at where you just inputted.
+ *    If there is a special key sequence, you should delete those characters in the input buffer,
+ *    and call certain events of the special key.
+ */
+static void special_key_detect() {
+    int numkey = ARRAY_SIZE(spec_key);
+    SpecialKey *sk;
+    int i;
+    for (i = 0; i < numkey; i++) {
+        if (spec_key[i] == 0) continue;
+        sk = spec_key[i];
+        // input_buf[cursor_pos - sk->len : cursor_pos] equals sk-> chr
+        if (cursor_pos < sk->len) continue;
+        int ppos = cursor_pos - sk->len;
+        int eqflag = 1;
+        int j;
+        for (j = 0; j < sk->len; j++) {
+            if (input_buf[ppos + j] == sk->chr[j]) continue;
+            else { eqflag = 0; break; }
+        }
+        if (eqflag) {
+            // Hit!
+            text_cur_move(ppos - cursor_pos);
+            for (j = 0; j < sk->len; j++) {
+                deleteChar();
+            }
+            if (key_event[i] != 0)
+                (key_event[i])(); // run callback
+            break;
+        }
+    }
+}
+
+
+/* ^^^^^^ Part 4. Top Interfaces ^^^^^^^^^ */
+
+/*
+ * Overview: callback method when finished entering a command.
+ * Pre-Condition: Finished entering a command and hit LF or CR.
+ * Post-Condition: Call command parser to run it, and start a new line.
+ */
 void inputenter() {
     if (input_size > 0) {
         input_buf[input_size] = 0;
         // TODO: call command parser and runner
         writef("@@@ command:\"%s\"\n", input_buf);
+        if (strcmp(input_buf, "exit") == 0) {
+            exit();
+        }
     }
     clearbuffer();
     writef("\n");
-    cur_color_front(COLOR_FRONT_WHITE);
-    writef("mos ");
-    cur_color_front(COLOR_FRONT_BLUE);
-    writef("$");
-    cur_color_restore();
-    writef(" ");
+    printhead();
 }
 
 /* 
@@ -129,28 +239,13 @@ void mainloop() {
         if (ch == '\r' || ch == '\n') {
             syscall_putchar('\n');
             inputenter();
-        } 
-        else if (ch == 'q') {
-            return;
-        } 
-        else if (ch == 'b') {
-            // BACKSPACE
-            text_cur_move(-1);
-            deleteChar();
-        } 
-        else if (ch == 'a') {
-            text_cur_move(-1);
-        }
-        else if (ch == 'd') {
-            text_cur_move(1);
-        }
-        else if (ch == 'x') {
-            deleteChar();
-        }
-        else if (ch >= 32 && ch <= 126) {
-            syscall_putchar(ch);
+        } else {
+            if (ch >= 32 && ch <= 126)
+                syscall_putchar(ch);
+            else
+                syscall_putchar('\?');
             insertChar(ch);
-            // reprint();
+            special_key_detect();
         }
     }
 }
@@ -158,14 +253,8 @@ void mainloop() {
 
 
 void umain(int argc, char **argv) {
-    writef("\n");
-    writef(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-    writef("::                                                         ::\n");
-    writef("::              \033[31mExtended Shell\033[0m  \033[33mV 2021.6\033[0m                   ::\n");
-    writef("::                                                         ::\n");
-    writef(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
     
-
+    printWelcome();
     inputenter();
     mainloop();
 
