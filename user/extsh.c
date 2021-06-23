@@ -53,10 +53,15 @@ static void reprint() {
     cur_move(cnt, CUR_MOVE_LEFT);
 }
 
+static void refresh() {
+    // 
+}
+
 inline static void clearbuffer() {
     input_size = 0;
     input_buf[0] = 0;
     cursor_pos = 0;
+    reprint();
 }
 
 static void insertChar(char ch) {
@@ -109,6 +114,12 @@ static void text_cur_move(int steps) {
 
 /* ^^^^^^ Part 3. Special Keys ^^^^^^^^^ */
 
+// declare history operations
+
+static void load_prev_history();
+static void load_next_history();
+static void store_history();
+
 
 /* Special Key Sequence */
 // #define SPECIAL_KEY_ESCAPE 0
@@ -155,11 +166,11 @@ void key_event_delete() {
 }
 
 void key_event_up() {
-    // TODO: not implemented yet
+    load_prev_history();
 }
 
 void key_event_down() {
-    // TODO: not implemented yet
+    load_next_history();
 }
 
 void key_event_left() {
@@ -218,7 +229,8 @@ void inputenter() {
     if (input_size > 0) {
         input_buf[input_size] = 0;
         int r;
-        
+        // record history
+        store_history();
         // inner command first
         r = runinnercmd(input_buf);
         if (r == 0) { // not inner command 
@@ -231,7 +243,6 @@ void inputenter() {
                     return;
                 } else {
                     // father
-                    // TODO: support background command (not wait)
                     wait(r);
                 }
             }
@@ -292,7 +303,51 @@ InnerCommand inner_cmd[] = {
     {"halt", cmd_halt} 
 };
 
-/* ^^^^^^ Part 6. Parser for shell ^^^^^^^^^ */
+/* ^^^^^^ Part 6. History ^^^^^^^^^ */
+int history_index;
+
+inline static void update_history_index() {
+    history_index = history_getcount() + 1;
+}
+
+void load_prev_history() {
+    if (history_index <= 0)
+        return;
+    history_index--;
+    history_load(history_index, input_buf);
+    input_size = 0;
+    for (; input_buf[input_size]; input_size++);
+    // cursor_pos = input_size;
+    text_cur_move(-cursor_pos);
+    reprint();
+    text_cur_move(input_size);
+}
+
+void load_next_history() {
+    int c = history_getcount();
+    if (history_index >= c) 
+        return;
+    history_index++;
+    if (history_index >= c) {
+        clearbuffer();
+        reprint();
+        return;
+    }
+    history_load(history_index, input_buf);
+    input_size = 0;
+    for (; input_buf[input_size]; input_size++);
+    text_cur_move(-cursor_pos);
+    reprint();
+    text_cur_move(input_size);
+}
+
+void store_history() {
+    history_store(input_buf);
+    update_history_index();
+}
+
+
+/* ^^^^^^ Part 7. Parser for shell ^^^^^^^^^ */
 
 int debug_ = 0;
 int interactive = '?';
