@@ -80,4 +80,6 @@ sys_call_table:                         // Syscall Table
      .word sys_get_page_ref
      .word sys_halt
      .word sys_noblock_getc
+     .word sys_environment_var
+
 

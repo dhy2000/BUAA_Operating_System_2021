@@ -73,6 +73,7 @@ int syscall_read_dev(u_int va,u_int dev,u_int offset);
 int syscall_get_page_ref(u_int va);
 void syscall_halt();
 int syscall_noblock_getc();
+int syscall_environment_var(int op, char *name, char *dst, int index);
 
 // string.c
 int strlen(const char *s);
@@ -144,6 +145,14 @@ int history_getcount();
 void history_store(const char *command);
 void history_load(int index, char *dst);
 void history_clear();
+
+// envvar.c
+
+int user_envvar_count();
+void user_envvar_name(int, char *dst);
+int user_envvar_set(const char *name, const char *val);
+int user_envvar_get(const char *name, char *dst);
+void user_envvar_rm(const char *name);
 
 #define user_assert(x)	\
 	do {	if (!(x)) user_panic("assertion failed: %s", #x); } while (0)

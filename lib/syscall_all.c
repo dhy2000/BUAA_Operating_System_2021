@@ -5,6 +5,8 @@
 #include <pmap.h>
 #include <sched.h>
 
+#include <var.h>
+
 extern char *KERNEL_SP;
 extern struct Env *curenv;
 
@@ -552,3 +554,21 @@ void sys_halt(int sysno) {
     halt();
 }
 
+int sys_environment_var(int sysno, int op, char *name, char *value, int index) {
+    switch (op) {
+    case ENV_VAR_GET:
+        return envvar_get(name, value);
+    case ENV_VAR_SET:
+        return envvar_set(name, value);
+    case ENV_VAR_UNSET:
+        envvar_rm(name);
+        return 0;
+    case ENV_VAR_COUNT:
+        return envvar_count();
+    case ENV_VAR_NAME:
+        envvar_name(index, name);
+        return 0;
+    default:
+        return -1;
+    }
+}

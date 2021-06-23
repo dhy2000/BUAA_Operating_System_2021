@@ -108,3 +108,8 @@ void syscall_halt() {
 int syscall_noblock_getc() {
     return msyscall(SYS_noblock_getc, 0, 0, 0, 0, 0);
 }
+
+
+int syscall_environment_var(int op, char *name, char *dst, int index) {
+    return msyscall(SYS_environment_var, op, name, dst, index, 0);
+}
