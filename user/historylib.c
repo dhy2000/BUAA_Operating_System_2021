@@ -3,7 +3,7 @@
 // Global variables are not supported, or fs_init will panic at reading superblock
 // ^^^^^^TOO LOW^^^^^^^^^
 
-#define HISTORY_FILENAME ".history"
+#define HISTORY_FILENAME "/.history"
 
 static char mhfgetc(int fd) {
     char ch;
@@ -30,12 +30,12 @@ static void mhfputs(int fd, const char *s) {
 }
 
 int history_getcount() {
-    int fd = open(HISTORY_FILENAME, O_RDWR | O_CREAT);
+    int fd = open(HISTORY_FILENAME, O_RDONLY);
     char last = 10, ch;
     int count = 0;
     if (fd < 0) {
         writef("error history_getcount\n");
-        return fd;
+        return 0;
     }
     
     while ((ch = mhfgetc(fd)) != -1) {
@@ -49,7 +49,7 @@ int history_getcount() {
 }
 
 void history_store(const char *command) {
-    int fd = open(HISTORY_FILENAME, O_RDWR | O_CREAT);
+    int fd = open(HISTORY_FILENAME, O_WRONLY | O_CREAT);
     if (fd < 0) {
         writef("error history_store\n");
         return;
@@ -64,7 +64,8 @@ void history_load(int index, char *dst) {
     char ch = 10;
     char *p = dst;
     int countlf = 0;
-    int fd = open(HISTORY_FILENAME, O_RDWR | O_CREAT);
+    int fd = open(HISTORY_FILENAME, O_RDONLY);
+    lseek(fd, 0, LSEEK_SET);
     if (fd < 0) {
         writef("error history_load\n");
         return;
@@ -80,6 +81,7 @@ void history_load(int index, char *dst) {
             ch = mhfgetc(fd);
             if (!ch || ch == -1 || ch == '\n')
                 break;
+            
             *p = ch;
             p++;
         }

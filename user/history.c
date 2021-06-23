@@ -26,9 +26,29 @@ void testhistory() {
 
 
 void umain(int argc, char **argv) {
-    writef("@ history.b : argc = %d\n", argc);
+    // writef("@ history.b : argc = %d\n", argc);
 
-    testhistory();
+    // testhistory();
+    int flagclr = 0;
+    int hiscount = 0;
+    char buf[1024];
+    int i;
 
+    if (argc >= 2) {
+        if (strcmp(argv[1], "-c") == 0) {
+            flagclr = 1;
+        }
+    }
+
+    if (flagclr) {
+        history_clear();
+        exit();
+    }
+    
+    hiscount = history_getcount();
+    for (i = 0; i < hiscount; i++) {
+        history_load(i, buf);
+        writef("\033[31m%d\033[0m: \033[34m%s\033[0m\n", i + 1, buf);
+    }
 
 }
