@@ -23,7 +23,8 @@ USERLIB := printf.o \
 		spawn.o \
 		console.o \
 		fprintf.o \
-		cursor.o
+		cursor.o \
+		historylib.o 
 
 CFLAGS += -nostdlib -static
 

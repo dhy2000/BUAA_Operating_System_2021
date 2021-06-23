@@ -134,9 +134,16 @@ int	stat(const char *path, struct Stat*);
 int	open(const char *path, int mode);
 int create(const char *path, int ftype); // added
 int	read_map(int fd, u_int offset, void **blk);
-int	delete(const char *path);
+int	remove(const char *path);
 int	ftruncate(int fd, u_int size);
 int	sync(void);
+
+// historylib.c
+
+int history_getcount();
+void history_store(const char *command);
+void history_load(int index, char *dst);
+void history_clear();
 
 #define user_assert(x)	\
 	do {	if (!(x)) user_panic("assertion failed: %s", #x); } while (0)
