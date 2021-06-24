@@ -9,7 +9,9 @@ void user_envvar_name(int index, char *dst) {
     syscall_environment_var(ENV_VAR_NAME, dst, 0, index);
 }
 
-int user_envvar_set(const char *name, const char *val) {
+int user_envvar_set(const char *name, const char *val, u_int ro) {
+    if (ro) 
+        return syscall_environment_var(ENV_VAR_SETRO, name, val, 0);
     return syscall_environment_var(ENV_VAR_SET, name, val, 0);
 }
 
@@ -19,4 +21,8 @@ int user_envvar_get(const char *name, char *dst) {
 
 void user_envvar_rm(const char *name) {
     return syscall_environment_var(ENV_VAR_UNSET, name, 0, 0);
+}
+
+int user_envvar_isro(const char *name) {
+    return syscall_environment_var(ENV_VAR_ISRO, name, 0, 0);
 }

@@ -7,6 +7,7 @@ int var_count = 0;
 
 char var_names[MAX_ENVVAR_NUM][MAX_ENVVAR_LEN];
 char var_values[MAX_ENVVAR_NUM][MAX_ENVVAR_LEN];
+u_char var_isro[MAX_ENVVAR_NUM];
 
 static int name2index(const char *name) {
     int i;
@@ -36,7 +37,7 @@ void envvar_name(int index, char *dst) {
 }
 
 
-int envvar_set(const char *name, const char *val) {
+int envvar_set(const char *name, const char *val, u_char ro) {
     if (var_count >= MAX_ENVVAR_NUM) {
         return -1;
     }
@@ -44,8 +45,14 @@ int envvar_set(const char *name, const char *val) {
     n = name2index(name);
     if (n < 0) {
         n = append_name(name);
+        var_isro[n] = 0;
+    }
+    if (var_isro[n]) {
+        printf("error: %s is read-only\n", name);
+        return -1;
     }
     strcpy(var_values[n], val);
+    var_isro[n] = ro;
     return 0;
 }
 
@@ -69,5 +76,14 @@ void envvar_rm(const char *name) {
     for (i = n; i < var_count; i++) {
         strcpy(var_names[i], var_names[i + 1]);
         strcpy(var_values[i], var_values[i + 1]);
+        var_isro[i] = var_isro[i + 1];
     }
+}
+
+int envvar_isro(const char *name) {
+    int n, i;
+    n = name2index(name);
+    if (n < 0) 
+        return 0;
+    return var_isro[n];
 }

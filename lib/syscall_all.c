@@ -559,7 +559,7 @@ int sys_environment_var(int sysno, int op, char *name, char *value, int index) {
     case ENV_VAR_GET:
         return envvar_get(name, value);
     case ENV_VAR_SET:
-        return envvar_set(name, value);
+        return envvar_set(name, value, 0);
     case ENV_VAR_UNSET:
         envvar_rm(name);
         return 0;
@@ -568,6 +568,10 @@ int sys_environment_var(int sysno, int op, char *name, char *value, int index) {
     case ENV_VAR_NAME:
         envvar_name(index, name);
         return 0;
+    case ENV_VAR_SETRO:
+        return envvar_set(name, value, 1);
+    case ENV_VAR_ISRO:
+        return envvar_isro(name);
     default:
         return -1;
     }

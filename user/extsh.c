@@ -296,13 +296,28 @@ static void cmd_halt(int argc, char **argv) {
 
 static void cmd_set(int argc, char **argv) {
     char *name = 0, *value = 0;
-    if (argc >= 3) {
-        name = argv[1];
-        value = argv[2];
-        user_envvar_set(name, value);
-    } else {
-        writef("usage: set varname varvalue\n");
+    int i;
+    u_char flagro = 0;
+    for (i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            if (strcmp(argv[i], "-r") == 0) {
+                flagro = 1;
+            } else {
+                writef("warning: unrecognized option %s\n", argv[i]);
+            }
+        } else {
+            if (name == 0)
+                name = argv[i];
+            else if (value == 0)
+                value = argv[i];
+        }
     }
+    if (name && value) {
+        user_envvar_set(name, value, flagro);
+    } else {
+        writef("usage: set [-r] varname varvalue\n");
+    }
+
 }
 
 static void cmd_unset(int argc, char **argv) {
@@ -317,16 +332,19 @@ static void cmd_unset(int argc, char **argv) {
 }
 
 static void cmd_export(int argc, char **argv) {
+    static const char *ROMark = " \033[32mRO\033[0m";
     u_char argFlag[128] = "";
     
     // default: list all environment variables
     char name[256], value[256];
     int n = user_envvar_count();
-    int i;
+    int i, ro;
     for (i = 0; i < n; i++) {
         user_envvar_name(i, name);
         user_envvar_get(name, value);
-        writef("\033[37m%s\033[0m=\033[35m%s\033[0m\n", name, value);
+        ro = user_envvar_isro(name);
+
+        writef("\033[37m%s\033[0m=\033[35m%s\033[0m%s\n", name, value, ro ? ROMark : "");
     }
 
 }

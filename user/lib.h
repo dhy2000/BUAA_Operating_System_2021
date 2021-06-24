@@ -150,9 +150,10 @@ void history_clear();
 
 int user_envvar_count();
 void user_envvar_name(int, char *dst);
-int user_envvar_set(const char *name, const char *val);
+int user_envvar_set(const char *name, const char *val, u_int ro);
 int user_envvar_get(const char *name, char *dst);
 void user_envvar_rm(const char *name);
+int user_envvar_isro(const char *name);
 
 #define user_assert(x)	\
 	do {	if (!(x)) user_panic("assertion failed: %s", #x); } while (0)
