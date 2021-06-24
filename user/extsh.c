@@ -334,19 +334,40 @@ static void cmd_unset(int argc, char **argv) {
 static void cmd_export(int argc, char **argv) {
     static const char *ROMark = " \033[32mRO\033[0m";
     u_char argFlag[128] = "";
-    
-    // default: list all environment variables
+    int i, j;
+    char *foutname = 0;
+    int fd = 1;
     char name[256], value[256];
-    int n = user_envvar_count();
-    int i, ro;
+    int n;
+    int ro;
+    for (i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-o") == 0) {
+            if (i + 1 >= argc) {
+                writef("error: no output file.\n");
+            } else {
+                foutname = argv[i + 1];
+            }
+        }
+    }
+    if (foutname) {
+        fd = open(foutname, O_WRONLY | O_CREAT);
+        if (fd < 0) {
+            writef("error: cannot open file %s\n", foutname);
+            return;
+        }
+    }
+    n = user_envvar_count();
+    // default: list all environment variables
     for (i = 0; i < n; i++) {
         user_envvar_name(i, name);
         user_envvar_get(name, value);
         ro = user_envvar_isro(name);
 
-        writef("\033[37m%s\033[0m=\033[35m%s\033[0m%s\n", name, value, ro ? ROMark : "");
+        fwritef(fd, "\033[37m%s\033[0m=\033[35m%s\033[0m%s\n", name, value, ro ? ROMark : "");
     }
-
+    if (fd > 1) {
+        close(fd);
+    }
 }
 
 
@@ -696,7 +717,16 @@ runit:
         close(fdredirect[1]);
     }
     
-    if ((r = spawn(argv[0], argv)) < 0)
+    // optional ".b"
+    char fullName[INPUT_MAX_LEN];
+    strcpy(fullName, argv[0]);
+    int len_name = strlen(fullName);
+    if ((len_name >= 1 && fullName[len_name - 1] != 'b') || 
+            (len_name >= 2 && fullName[len_name - 2] != '.')) {
+        strcat(fullName, ".b");
+    }
+
+    if ((r = spawn(fullName, argv)) < 0)
         writef("error spawn %s: %e\n", argv[0], r);
     close_all();
     if (r >= 0) {
