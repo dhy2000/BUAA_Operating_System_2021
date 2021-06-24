@@ -24,7 +24,8 @@ USERLIB := printf.o \
 		console.o \
 		fprintf.o \
 		cursor.o \
-		historylib.o 
+		historylib.o \
+		envvar.o 
 
 CFLAGS += -nostdlib -static
 

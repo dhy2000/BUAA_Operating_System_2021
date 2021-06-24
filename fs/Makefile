@@ -20,7 +20,8 @@ USERLIB :=  $(user_dir)/printf.o \
 		$(user_dir)/console.o \
 		$(user_dir)/fprintf.o \
 		$(user_dir)/cursor.o \
-		$(user_dir)/historylib.o
+		$(user_dir)/historylib.o \
+		$(user_dir)/envvar.o 
 
 FSLIB :=	fs.o \
 		ide.o \

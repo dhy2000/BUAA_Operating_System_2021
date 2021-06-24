@@ -1,5 +1,6 @@
 #include "lib.h"
 #include "cursor.h"
+
 #include <args.h>
 
 #define ARRAY_SIZE(arr) (sizeof((arr)) / sizeof((arr)[0]))
@@ -291,6 +292,44 @@ static void cmd_halt(int argc, char **argv) {
     syscall_halt();
 }
 
+static void cmd_set(int argc, char **argv) {
+    char *name = 0, *value = 0;
+    if (argc >= 3) {
+        name = argv[1];
+        value = argv[2];
+        user_envvar_set(name, value);
+    } else {
+        writef("usage: set varname varvalue\n");
+    }
+}
+
+static void cmd_unset(int argc, char **argv) {
+    char *name = 0;
+    if (argc >= 2) {
+        name = argv[1];
+        user_envvar_rm(name);
+    }
+    else {
+        writef("usage: unset varname\n");
+    }
+}
+
+static void cmd_export(int argc, char **argv) {
+    u_char argFlag[128] = "";
+    
+    // default: list all environment variables
+    char name[256], value[256];
+    int n = user_envvar_count();
+    int i;
+    for (i = 0; i < n; i++) {
+        user_envvar_name(i, name);
+        user_envvar_get(name, value);
+        writef("\033[37m%s\033[0m=\033[35m%s\033[0m\n", name, value);
+    }
+
+}
+
+
 typedef struct {
     char *cmd;
     void (*run)(int , char **);
@@ -300,7 +339,10 @@ InnerCommand inner_cmd[] = {
     {"clear", cmd_clear}, 
     {"exit", cmd_halt}, 
     {"quit", cmd_halt},
-    {"halt", cmd_halt} 
+    {"halt", cmd_halt},
+    {"set", cmd_set},
+    {"unset", cmd_unset},
+    {"export", cmd_export}
 };
 
 /* ^^^^^^ Part 6. History ^^^^^^^^^ */

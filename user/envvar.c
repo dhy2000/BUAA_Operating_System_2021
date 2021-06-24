@@ -14,7 +14,7 @@ int user_envvar_set(const char *name, const char *val) {
 }
 
 int user_envvar_get(const char *name, char *dst) {
-    return syscall_environment_var(ENV_VAR_GET, name, val, 0);
+    return syscall_environment_var(ENV_VAR_GET, name, dst, 0);
 }
 
 void user_envvar_rm(const char *name) {

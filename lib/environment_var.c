@@ -3,7 +3,7 @@
 
 #define MAX_ENVVAR_NUM 16
 #define MAX_ENVVAR_LEN 256
-int var_count;
+int var_count = 0;
 
 char var_names[MAX_ENVVAR_NUM][MAX_ENVVAR_LEN];
 char var_values[MAX_ENVVAR_NUM][MAX_ENVVAR_LEN];
@@ -20,8 +20,10 @@ static int name2index(const char *name) {
 
 // return the index of the new name
 inline static int append_name(const char *name) {
+    // assert var_count < MAX_ENVVAR_NUM;
     strcpy(var_names[var_count], name);
     var_count++;
+    return var_count - 1;
 }
 
 int envvar_count() {
@@ -36,7 +38,6 @@ void envvar_name(int index, char *dst) {
 
 int envvar_set(const char *name, const char *val) {
     if (var_count >= MAX_ENVVAR_NUM) {
-        printf("envvar: already reached maximum count\n");
         return -1;
     }
     int n;
