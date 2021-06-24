@@ -18,6 +18,60 @@ struct Env_list env_sched_list[2];      // Runnable list
 extern Pde *boot_pgdir;
 extern char *KERNEL_SP;
 
+/* Bitmap Management on ASID */
+#define N_BITMAP_ASID 64
+static u_char Bitmap_ASID[8];
+
+static u_char bitmap_get(void *addr, int index) {
+    
+    if (index >= N_BITMAP_ASID)
+        panic("asid overflow");
+    int byte_off = index >> 3;
+    int byte_in = index & 7;
+    return !!( ((u_char*)addr)[byte_off] & (1 << byte_in) );
+}
+
+static void bitmap_sethi(void *addr, int index) {
+    if (index >= N_BITMAP_ASID)
+        panic("asid overflow");
+    int byte_off = index >> 3;
+    int byte_in = index & 7;
+    ((u_char*)addr)[byte_off] |= (1 << byte_in);
+}
+
+static void bitmap_setlo(void *addr, int index) {
+    if (index >= N_BITMAP_ASID)
+        panic("asid overflow");
+    int byte_off = index >> 3;
+    int byte_in = index & 7;
+    ((u_char*)addr)[byte_off] &= (~(1 << byte_in));
+}
+
+static int bitmap_firstlo(void *addr) {
+    int i;
+    for (i = 0; i < N_BITMAP_ASID; i++) {
+        if (bitmap_get(addr, i) == 0)
+            return i;
+    }
+    return -1;
+}
+
+static int ASID_alloc() {
+    int asid = bitmap_firstlo(Bitmap_ASID);
+    if (asid < 0)
+        panic("Too much envs");
+    bitmap_sethi(Bitmap_ASID, asid);
+    return asid;
+}
+
+static void ASID_free(int asid) {
+    if (asid >= N_BITMAP_ASID)
+        panic("asid overflow");
+    if (!bitmap_get(Bitmap_ASID, asid)) 
+        panic("Attempting to free a free asid");
+    bitmap_setlo(Bitmap_ASID, asid);
+
+}
 
 /* Overview:
  *  This function is for making an unique ID for every env.
@@ -36,8 +90,12 @@ u_int mkenvid(struct Env *e)
     /*Hint: lower bits of envid hold e's position in the envs array. */
     u_int idx = e - envs;
 
+    // ASID
+    u_int asid = ASID_alloc();
+
     /*Hint:  high bits of envid hold an increasing number. */
-    return (++next_env_id << (1 + LOG2NENV)) | idx;
+    // return (++next_env_id << (1 + LOG2NENV)) | idx;
+    return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
 }
 
 /* Overview:
@@ -426,6 +484,8 @@ env_free(struct Env *e)
     e->env_status = ENV_FREE;
     LIST_INSERT_HEAD(&env_free_list, e, env_link);
     LIST_REMOVE(e, env_sched_link);
+    // free asid
+    ASID_free(e->env_id >> 11);
 }
 
 /* Overview:
