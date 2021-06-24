@@ -579,6 +579,7 @@ runcmd(const char *ss)
     int argc, c, i, r, p[2], fd, rightpipe;
     int fdnum;
     int isbackground = 0;
+    int fdredirect[2] = {0, 1};
     rightpipe = 0;
     gettoken(s, 0);
 again:
@@ -604,8 +605,9 @@ again:
             r = open(t, O_RDONLY);
             if (r < 0) { user_panic("sh.c failed to open file"); }
             fd = r;
-            dup(fd, 0);
-            close(fd);
+            fdredirect[0] = fd;
+            // dup(fd, 0);
+            // close(fd);
             
             // dup it onto fd 0, and then close the fd you got.
             // user_panic("< redirection not implemented");
@@ -620,8 +622,10 @@ again:
             r = open(t, O_WRONLY | O_CREAT);
             if (r < 0) {user_panic("sh.c failed to open file");}
             fd = r;
-            dup(fd, 1);
-            close(fd);
+            fdredirect[1] = fd;
+            // dup(fd, 1);
+            // close(fd);
+            
             // dup it onto fd 1, and then close the fd you got.
             // user_panic("> redirection not implemented");
             break;
@@ -660,6 +664,8 @@ again:
             break;
         case ';':
             if ((r = fork()) == 0) {
+                fdredirect[0] = 0;
+                fdredirect[1] = 1;
                 goto again;
             } else {
                 goto runit;
@@ -677,6 +683,18 @@ runit:
         return;
     }
     argv[argc] = 0;
+    if (fdredirect[0] != 0) {
+        // writef("%s: < %d\n", argv[0], fdredirect[0]);
+        dup(fdredirect[0], 0);
+        close(fdredirect[0]);
+    }
+    if (fdredirect[1] != 1) {
+        if (!rightpipe) { 
+            // writef("%s: > %d\n", argv[0], fdredirect[1]);
+            dup(fdredirect[1], 1);
+        }
+        close(fdredirect[1]);
+    }
     
     if ((r = spawn(argv[0], argv)) < 0)
         writef("error spawn %s: %e\n", argv[0], r);
