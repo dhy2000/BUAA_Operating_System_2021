@@ -332,7 +332,8 @@ static void cmd_unset(int argc, char **argv) {
 }
 
 static void cmd_export(int argc, char **argv) {
-    static const char *ROMark = " \033[32mRO\033[0m";
+    static const char *ROMark = " RO";
+    static const char *ROMark_col = " \033[32mRO\033[0m";
     u_char argFlag[128] = "";
     int i, j;
     char *foutname = 0;
@@ -362,8 +363,10 @@ static void cmd_export(int argc, char **argv) {
         user_envvar_name(i, name);
         user_envvar_get(name, value);
         ro = user_envvar_isro(name);
-
-        fwritef(fd, "\033[37m%s\033[0m=\033[35m%s\033[0m%s\n", name, value, ro ? ROMark : "");
+        if (fd > 1)
+            fwritef(fd, "%s=%s%s\n", name, value, ro ? ROMark : "");
+        else
+            writef("\033[37m%s\033[0m=\033[35m%s\033[0m%s\n", name, value, ro ? ROMark_col : "");
     }
     if (fd > 1) {
         close(fd);
