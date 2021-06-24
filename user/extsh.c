@@ -58,10 +58,12 @@ static void refresh() {
     // 
 }
 
+static void text_cur_move(int);
 inline static void clearbuffer() {
     input_size = 0;
     input_buf[0] = 0;
-    cursor_pos = 0;
+    // cursor_pos = 0;
+    text_cur_move(-cursor_pos);
     reprint();
 }
 
@@ -95,7 +97,7 @@ static void deleteChar() {
 }
 
 
-static void text_cur_move(int steps) {
+void text_cur_move(int steps) {
     // <0: left, >0: right
     if (steps < 0) {
         steps = -steps;
@@ -349,7 +351,7 @@ InnerCommand inner_cmd[] = {
 int history_index;
 
 inline static void update_history_index() {
-    history_index = history_getcount() + 1;
+    history_index = history_getcount();
 }
 
 void load_prev_history() {
@@ -367,12 +369,11 @@ void load_prev_history() {
 
 void load_next_history() {
     int c = history_getcount();
-    if (history_index >= c) 
-        return;
     history_index++;
     if (history_index >= c) {
+        update_history_index();
         clearbuffer();
-        reprint();
+        // reprint();
         return;
     }
     history_load(history_index, input_buf);

@@ -34,7 +34,7 @@ int history_getcount() {
     char last = 10, ch;
     int count = 0;
     if (fd < 0) {
-        writef("error history_getcount\n");
+        // writef("error history_getcount\n");
         return 0;
     }
     
@@ -51,7 +51,7 @@ int history_getcount() {
 void history_store(const char *command) {
     int fd = open(HISTORY_FILENAME, O_WRONLY | O_CREAT);
     if (fd < 0) {
-        writef("error history_store\n");
+        // writef("error history_store\n");
         return;
     }
     lseek(fd, 0, LSEEK_END);
@@ -67,7 +67,7 @@ void history_load(int index, char *dst) {
     int fd = open(HISTORY_FILENAME, O_RDONLY);
     lseek(fd, 0, LSEEK_SET);
     if (fd < 0) {
-        writef("error history_load\n");
+        // writef("error history_load\n");
         return;
     }
     while (countlf < index) {
