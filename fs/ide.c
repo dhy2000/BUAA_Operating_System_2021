@@ -125,7 +125,7 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
     writef("ide_write: diskno=%d, secno=%d, nsecs=%d\n", diskno, secno, nsecs);
 #endif
     // DO NOT DELETE WRITEF !!!
-	writef("diskno: %d\n", diskno);
+	// writef("diskno: %d\n", diskno);
 #ifdef DEBUG_IDERW 
     writef("ide_write: will write ");
 #ifdef DEBUG_SHOWMEM
