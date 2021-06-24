@@ -44,7 +44,7 @@ void
 ls1(char *prefix, u_int isdir, u_int size, char *name)
 {
 	char *sep;
-
+    int len;
 	if(flag['l'])
 		fwritef(1, "%11d %c ", size, isdir ? 'd' : '-');
 	if(prefix) {
@@ -56,8 +56,13 @@ ls1(char *prefix, u_int isdir, u_int size, char *name)
 	}
     if (isdir) 
         cur_color_front(COLOR_FRONT_BLUE);
-    else
-        cur_color_front(COLOR_FRONT_WHITE);
+    else {
+        len = strlen(name);
+        if (len > 2 && name[len - 1] == 'b' && name[len - 2] == '.')
+            cur_color_front(COLOR_FRONT_GREEN);
+        else
+            cur_color_front(COLOR_FRONT_WHITE);
+    }
 	fwritef(1, "%s", name);
     cur_color_restore();
 	if(flag['F'] && isdir)

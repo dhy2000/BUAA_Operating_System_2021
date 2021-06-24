@@ -4,13 +4,19 @@
 
 void tree_print(char *name, int depth, int ftype) {
     int i;
+    int len;
     for (i = 0; i < depth; i++) {
         writef("--");
     }
+    len = strlen(name);
     if (ftype == FTYPE_DIR)
         cur_color_front(COLOR_FRONT_BLUE);
-    else
-        cur_color_front(COLOR_FRONT_WHITE);
+    else {
+        if (len > 2 && name[len - 1] == 'b' && name[len - 2] == '.')
+            cur_color_front(COLOR_FRONT_GREEN);
+        else
+            cur_color_front(COLOR_FRONT_WHITE);
+    }
     writef("%s", name);
     cur_color_restore();
     writef("\n");
