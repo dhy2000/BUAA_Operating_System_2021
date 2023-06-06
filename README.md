@@ -4,14 +4,16 @@
 
 已完成 `lab6-challenge` 并申优。
 
-## Referneces
+## Acknowledgements
 
-lab2 - lab6 课下参考了以下 repos:
+完成 lab2 - lab6 以及 challenge 过程中，感谢以下 repos 作者的帮助:
 
 - [login256](https://github.com/login256/BUAA-OS-2019)
 - [VOIDMalkuth](https://github.com/VOIDMalkuth/BUAA_OS_2019_Code)
 - [refkxh](https://github.com/refkxh/BUAA_OS_2020Spring)
 - [Michael-Steven](https://github.com/Michael-Steven/BUAA_OS_2019)
+- [Coekjan](https://github.com/Coekjan/SOMOS)
+- [roife](https://github.com/roife/BUAA-OS)
 
 ## Environment
 
